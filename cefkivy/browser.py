@@ -22,9 +22,10 @@ from kivy.graphics import Color, Rectangle
 from kivy.graphics.texture import Texture
 from kivy.properties import *
 from kivy.uix.widget import Widget
-from cefkeyboard import CefKeyboardManager
 from kivy.clock import Clock
 from kivy.core.window import Window
+
+from .cefkeyboard import CefKeyboardManager
 
 
 class CefBrowser(Widget):
@@ -215,7 +216,7 @@ class CefBrowser(Widget):
         pass
 
     def OnCertificateError(self, err, url, cb):
-        print err, url, cb
+        print(err, url, cb)
         # Check if cert verification is disabled
         if os.path.isfile("/etc/rentouch/ssl-verification-disabled"):
             cb.Continue(True)
