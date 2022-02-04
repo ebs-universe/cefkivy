@@ -6,10 +6,11 @@
 #===============================================================================
 
 from setuptools import setup
-from pip.req import parse_requirements
 
-install_reqs = parse_requirements("requirements.txt")
-reqs = [str(ir.req) for ir in install_reqs]
+install_reqs = [
+    'cefpython3',
+    'kivy',
+]
 
 # -----------------------------------------------------------------------------
 import cefkivy
@@ -19,13 +20,20 @@ setup(name='cefkivy',
       version=cefkivy.__version__,
       author='Rentouch GmbH',
       author_email='info@rentouch.ch',
-      url='http://www.rentouch.ch',
+      maintainer="Chintalagiri Shashank",
+      maintainer_email="shashank@chintal.in",
+      url='https://github.com/ebs-universe/cefkivy',
 
       package_data={'cefkivy': ['images/*.png', '*.kv']},
 
       packages=['cefkivy', ],
 
-      install_requires=reqs
+      install_requires=install_reqs,
+      entry_points={
+            'console_scripts': [
+                  'cefkivy-example = cefkivy.example:run'
+            ]
+      },
 )
 
 # -----------------------------------------------------------------------------
