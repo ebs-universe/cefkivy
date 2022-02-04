@@ -1,3 +1,41 @@
+
+About this Fork
+---------------
+This is forked from rentouch/cefkivy for the sole purpose of making it pip 
+installable and minimal maintenance to ensure functionality. 
+
+  - At the time of the fork, upstream has remained unchanged 
+  for 8 years. 
+  - One pseudo fork has been published to PyPI with the cefkivy 
+  package name with no apparant commits and/or no real version history.
+
+As such, the original rentouch cefkivy repository is being forked here and 
+will be made available as the `cefkivy-ebs` package on PyPI. 
+
+If you are cnsidering using this, please note that: 
+
+  - I do not really have the bandwidth to maintain this fork, nor the 
+  direct experience needed to do anything more than minor tweaks. I will 
+  make a best effort to keep this package installable with no / minimal 
+  feature addition.
+  - If upstream resumes development, or an alternate means to provide a 
+  browser widget to Kivy is developed, this fork and the associated pypi 
+  package will likely become unmaintained.
+  - Issues are welcome. Those dealing with install and basic functionality 
+  will be prioritized. Feature / upgrade requests, if meaningful, will be 
+  left open.
+  - Pull Requests are welcome, as long as the change they make breaks no 
+  existing functionality.
+  - If you are able and willing to take over or contribute to the development 
+  of this package, please get in touch with me. Primarily, I anticipate 
+  skilled time will needed to be invested to help bring this (and if 
+  necessary, cefpython3) up to date and keep it there. 
+
+
+Original README.md 
+------------------
+
+
 How to install
 ==============
 Notes about the requirements.txt file:
