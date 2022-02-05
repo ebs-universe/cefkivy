@@ -1,22 +1,33 @@
 
 About this Fork
 ---------------
-This is forked from rentouch/cefkivy for the sole purpose of making it pip 
+
+This package builds on a lot of good work of other people, including the 
+developers of :
+  - [CEF](https://bitbucket.org/chromiumembedded/cef/src/master/)
+  - [cefpython](https://github.com/cztomczak/cefpython)
+  - The CEF [Kivy Garden flower](https://github.com/kivy-garden/garden.cefpython)
+  - The [cefkivy](https://github.com/rentouch/cefkivy) fork of the Kivy Garden flower.
+
+This is forked from `rentouch/cefkivy` for the sole purpose of making it pip 
 installable and minimal maintenance to ensure functionality. 
 
   - At the time of the fork, upstream has remained unchanged 
   for 8 years. 
   - One pseudo fork has been published to PyPI with the cefkivy 
-  package name with no apparant commits and/or no real version history.
+  package name with no apparent commits and/or no real version history.
 
 As such, the original rentouch cefkivy repository is being forked here and 
 will be made available as the `cefkivy-ebs` package on PyPI. 
 
-If you are cnsidering using this, please note that: 
+This package contains no EBS-specific code and has no dependencies 
+outside of `cefpython3`, `kivy`, and the Python Standard Library. 
+For detailed install notes, see [INSTALL.md](INSTALL.md).
 
-  - I do not really have the bandwidth to maintain this fork, nor the 
-  direct experience needed to do anything more than minor tweaks. I will 
-  make a best effort to keep this package installable with no / minimal 
+If you are considering using this, please note that: 
+
+  - I do not really have the bandwidth to maintain this fork. I will 
+  make the best effort to keep this package installable with minimal 
   feature addition.
   - If upstream resumes development, or an alternate means to provide a 
   browser widget to Kivy is developed, this fork and the associated pypi 
@@ -28,9 +39,13 @@ If you are cnsidering using this, please note that:
   existing functionality.
   - If you are able and willing to take over or contribute to the development 
   of this package, please get in touch with me. Primarily, I anticipate 
-  skilled time will needed to be invested to help bring this (and if 
-  necessary, cefpython3) up to date and keep it there. 
+  skilled time will need to be invested to help bring this (and `cefpython3`) 
+  up to date and keep it there.
 
+If you do end up using this package - especially if you do so in a 
+production setting - please reach out to me and let me know by email at 
+shashank at chintal dot in. The number of users, if any, is likely to 
+determine how much effort I will put into maintaining this.
 
 Original README.md 
 ------------------

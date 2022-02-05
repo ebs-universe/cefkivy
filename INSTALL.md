@@ -1,15 +1,15 @@
-cefkivy-ebs
-========
 
+cefkivy-ebs
+===========
 
 preliminary notes
-------------------------
+-----------------
 
  * Everything here is only for `python3`. If you want to use `python2`, work through the process independently.   
  * `cefkivy` is a wrapper / adapter which uses `cefpython3` under the hood to provide a widget for use in Kivy applications.
  * `cefpython3` provides python bindings to the `cef` library
  * `cef` provides a way to embed a specific chromium version in other applications.
- * The latest realease of `cefpython3` is built for version 66.
+ * The latest release of `cefpython3` is built for version 66.
  * `cefpython3` does not support ARM. See [cztomczak/cefpython #267](https://github.com/cztomczak/cefpython/issues/267).
  * `cefpython3` does not support Android.`
  * `cefpython3` builds for linux stop at version 66.0, which only supports upto python 3.7.x. Version 66.1, which supports later python versions, has only been officially built for Windows. See [cztomczak/cefpython #609](https://github.com/cztomczak/cefpython/issues/609).
@@ -18,7 +18,7 @@ preliminary notes
 
 
 quick installation on x86-64 / amd64
---------------------------------------------------
+-------------------------------------
 
  * Build, if any, is based on [Quick build instructions for Linux](https://github.com/cztomczak/cefpython/blob/master/docs/Build-instructions.md#quick-build-instructions-for-linux).
  * Installation tested on `Ubuntu 20.04.3`, for (hopefully) eventual deployment on Debian `buster` or `bullseye`.
