@@ -17,14 +17,18 @@ installable and minimal maintenance to ensure functionality.
   - One pseudo fork has been published to PyPI with the cefkivy 
   package name with no apparent commits and/or no real version history.
 
-As such, the original rentouch cefkivy repository is being forked here and 
-will be made available as the `cefkivy-ebs` package on PyPI. 
+As such, the original rentouch cefkivy repository is being forked here 
+and will be made available as the `cefkivy-ebs` package on PyPI. 
+
+Though the package will be installed as `cefkivy-ebs`, the actual 
+importable package will still be `cefkivy`. As such, this fork and 
+upstream cannot coexist in the same virtual environment. 
 
 This package contains no EBS-specific code and has no dependencies 
 outside of `cefpython3`, `kivy`, and the Python Standard Library. 
 For detailed install notes, see [INSTALL.md](INSTALL.md).
 
-If you are considering using this, please note that: 
+If you are considering using this: 
 
   - I do not really have the bandwidth to maintain this fork. I will 
   make the best effort to keep this package installable with minimal 

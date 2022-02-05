@@ -5,6 +5,7 @@
 # Written by Rentouch 2013 - http://www.rentouch.ch
 #===============================================================================
 
+import setuptools
 from setuptools import setup
 
 install_reqs = [
@@ -12,11 +13,10 @@ install_reqs = [
     'kivy',
 ]
 
-# -----------------------------------------------------------------------------
 import cefkivy
 
 # setup
-setup(name='cefkivy',
+setup(name='cefkivy-ebs',
       version=cefkivy.__version__,
       author='Rentouch GmbH',
       author_email='info@rentouch.ch',
@@ -24,18 +24,15 @@ setup(name='cefkivy',
       maintainer_email="shashank@chintal.in",
       url='https://github.com/ebs-universe/cefkivy',
 
+      packages=setuptools.find_packages(),
       package_data={'cefkivy': ['*.kv']},
 
-      packages=['cefkivy', ],
-
+      python_requires='>=3.4, <3.8',
       install_requires=install_reqs,
+
       entry_points={
             'console_scripts': [
                   'cefkivy-example = cefkivy.example:run'
-            ]
-      },
-      python_requires='>=3.4, <3.8',
-)
-
-# -----------------------------------------------------------------------------
+            ]},
+      )
 
