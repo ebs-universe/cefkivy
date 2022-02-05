@@ -3,6 +3,7 @@
 import ctypes
 import sys
 import os
+import platform
 
 libcef_so = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'libcef.so')
 if os.path.exists(libcef_so):
@@ -28,6 +29,14 @@ from kivy.core.window import Window
 from kivy.logger import Logger
 
 from .cefkeyboard import CefKeyboardManager
+from .handlers.display import DisplayHandler
+from .handlers.download import DownloadHandler
+from .handlers.jsdialog import JavascriptDialogHandler
+from .handlers.keyboard import KeyboardHandler
+from .handlers.lifespan import LifespanHandler
+from .handlers.load import LoadHandler
+from .handlers.render import RenderHandler
+from .handlers.request import RequestHandler
 
 
 class CefBrowser(Widget):
@@ -44,26 +53,39 @@ class CefBrowser(Widget):
     touches = []
     is_loading = BooleanProperty(True)
 
+    _handlers = [
+        DisplayHandler,
+        DownloadHandler,
+        JavascriptDialogHandler,
+        KeyboardHandler,
+        LifespanHandler,
+        LoadHandler,
+        RenderHandler,
+        RequestHandler,
+    ]
+
     _reset_js_bindings = False  # See set_js_bindings()
     _js_bindings = None  # See set_js_bindings()
 
     def __init__(self, **kwargs):
+        switches = kwargs.pop("switches", {})
         self.url = kwargs.pop("start_url", "")
         self.keyboard_mode = kwargs.pop("keyboard_mode", "local")
         self.resources_dir = kwargs.pop("resources_dir", "")
         self.keyboard_above_classes = kwargs.pop("keyboard_above_classes", [])
         self.ssl_verification_disabled = kwargs.pop("ssl_verification_disabled", False)
-        switches = kwargs.pop("switches", {})
         self.__rect = None
         self.browser = None
         if kwargs.keys():
             Logger.error("cefkivy: Unexpected kwargs encountered : {}".format(kwargs))
         super(CefBrowser, self).__init__(**kwargs)
 
+        self.check_versions()
+
         Logger.debug("cefkivy: Instantiating Browser Popup")
         self.popup = CefBrowserPopup(self)
 
-        Logger.debug("cefkivy: Creating Event Types")
+        # Create Event Types
         self.register_event_type("on_loading_state_change")
         self.register_event_type("on_address_change")
         self.register_event_type("on_title_change")
@@ -72,13 +94,11 @@ class CefBrowser(Widget):
         self.register_event_type("on_load_end")
         self.register_event_type("on_load_error")
         self.register_event_type("on_certificate_error")
-        self.register_event_type("on_js_dialog")
-        self.register_event_type("on_before_unload_dialog")
 
-        Logger.debug("cefkivy: Preparing the Keyboard Manager")
+        # Create the keyboard manager
         self.key_manager = CefKeyboardManager(cefpython=cefpython, browser_widget=self)
 
-        Logger.debug("cefkivy: Creating the Base Texture")
+        # Create the base texture
         self.texture = Texture.create(size=self.size, colorfmt='rgba', bufferfmt='ubyte')
         self.texture.flip_vertical()
         with self.canvas:
@@ -101,10 +121,10 @@ class CefBrowser(Widget):
 
         settings = {
             # "debug": True,
-            "log_severity": cefpython.LOGSEVERITY_INFO,
+            "log_severity": cefpython.LOGSEVERITY_WARNING,
             # "log_file": "debug.log",
             "persist_session_cookies": True,
-            "release_dcheck_enabled": True,  # Enable only when debugging.
+            # "release_dcheck_enabled": True,  # Enable only when debugging.
             "locales_dir_path": os.path.join(md, "locales"),
             "browser_subprocess_path": "%s/%s" % (cefpython.GetModuleDirectory(), "subprocess")
         }
@@ -115,6 +135,7 @@ class CefBrowser(Widget):
         cefpython.Initialize(settings, switches)
 
         # Disable Windowed rendering and and bind to parent window 0
+        # TODO Set a proper parent?
         # See https://github.com/cztomczak/cefpython/blob/master/api/WindowInfo.md#setasoffscreen
         windowInfo = cefpython.WindowInfo()
         windowInfo.SetAsOffscreen(0)
@@ -134,9 +155,9 @@ class CefBrowser(Widget):
 
         self.browser.SendFocusEvent(True)
 
-        Logger.debug("cefkivy: Creating the ClientHandler")
-        ch = ClientHandler(self)
-        self.browser.SetClientHandler(ch)
+        Logger.debug("cefkivy: Installing Client Handlers")
+        for handler in self._handlers:
+            self.install_handler(handler)
 
         Logger.debug("cefkivy: Setting JS Bindings")
         self.set_js_bindings()
@@ -150,6 +171,23 @@ class CefBrowser(Widget):
         self.bind(keyboard_mode=self.set_keyboard_mode)
         if self.keyboard_mode == "global":
             self.request_keyboard()
+
+    def check_versions(self):
+        ver = cefpython.GetVersion()
+        Logger.info("cefkivy: CEF Python : {ver}".format(ver=ver["version"]))
+        Logger.info("cefkivy:   Chromium : {ver}".format(ver=ver["chrome_version"]))
+        Logger.info("cefkivy:        CEF : {ver}".format(ver=ver["cef_version"]))
+        Logger.info("cefkivy:     Python : {ver} {arch}".format(
+            ver=platform.python_version(),
+            arch=platform.architecture()[0]))
+
+    def install_handler(self, handler):
+        Logger.debug("cefkivy: Installing ClientHandler <Class {}>".format(handler.__name__))
+        self.browser.SetClientHandler(handler(self))
+
+    @property
+    def reset_js_bindings(self):
+        return self._reset_js_bindings
 
     def set_js_bindings(self):
         # Needed to introduce set_js_bindings again because the freeze of sites at load took over.
@@ -226,14 +264,6 @@ class CefBrowser(Widget):
     def on_before_popup(self, browser, frame, targetUrl, targetFrameName,
                         popupFeatures, windowInfo, client, browserSettings,
                         noJavascriptAccess):
-        pass
-
-    def on_js_dialog(self, browser, origin_url, accept_lang, dialog_type,
-                     message_text, default_prompt_text, callback,
-                     suppress_message):
-        pass
-
-    def on_before_unload_dialog(self, browser, message_text, is_reload, callback):
         pass
 
     def on_certificate_error(self, err, url, cb):
@@ -465,7 +495,7 @@ class CefBrowserPopup(Widget):
         parent.bind(pos=self.realign)
         parent.bind(size=self.realign)
 
-    def realign(self, *largs):
+    def realign(self, *args):
         self.x = self.rx+self.browser_widget.x
         self.y = self.browser_widget.height-self.ry-self.height+self.browser_widget.y
         ts = self.texture.size
@@ -486,211 +516,6 @@ class CefBrowserPopup(Widget):
     def update_rect(self):
         if self.__rect:
             self.__rect.texture = self.texture
-
-
-class ClientHandler():
-    def __init__(self, browserWidget):
-        self.browser_widget = browserWidget
-
-    # DisplayHandler
-
-    def OnLoadingStateChange(self, browser, isLoading, canGoBack, canGoForward):
-        self.browser_widget.dispatch("on_loading_state_change", isLoading, canGoBack, canGoForward)
-        bw = self.browser_widget
-        if bw._reset_js_bindings and not isLoading:
-            if bw:
-                bw.set_js_bindings()
-        if isLoading and bw \
-                and bw.keyboard_mode == "local":
-            # Release keyboard when navigating to a new page.
-            bw.release_keyboard()
-
-    def OnAddressChange(self, browser, frame, url):
-        self.browser_widget.dispatch("on_address_change", frame, url)
-
-    def OnTitleChange(self, browser, newTitle):
-        self.browser_widget.dispatch("on_title_change", newTitle)
-
-    def OnTooltip(self, *largs):
-        return True
-
-    def OnStatusMessage(self, *largs):
-        pass
-
-    def OnConsoleMessage(self, *largs):
-        pass
-
-    # DownloadHandler
-
-    # DragHandler
-
-    # JavascriptContextHandler
-    def OnJSDialog(self, *kwargs):
-        self.browser_widget.dispatch("on_js_dialog", *kwargs)
-        return True
-
-    def OnBeforeUnloadDialog(self, *kwargs):
-        self.browser_widget.dispatch("on_before_unload_dialog", *kwargs)
-        return True
-
-    # KeyboardHandler
-
-    def OnPreKeyEvent(self, *largs):
-        pass
-
-    def OnKeyEvent(self, *largs):
-        pass
-
-    # LifeSpanHandler
-
-    def OnBeforePopup(self, *kwargs):
-        self.browser_widget.dispatch("on_before_popup", *kwargs)
-        return True
-
-    # LoadHandler
-
-    def OnLoadStart(self, browser, frame):
-        self.browser_widget.dispatch("on_load_start", frame)
-        bw = self.browser_widget
-        if bw and bw.keyboard_mode == "local":
-            lrectconstruct = "var rect = e.target.getBoundingClientRect();var lrect = [rect.left, rect.top, rect.width, rect.height];"
-            if frame.GetParent():
-                lrectconstruct = "var lrect = [];"
-            jsCode = """
-window.print=function(){console.log("Print dialog blocked")}
-function isKeyboardElement(elem) {
-    var tag = elem.tagName.toUpperCase();
-    if (tag=="INPUT") return (["TEXT", "PASSWORD", "DATE", "DATETIME", "DATETIME-LOCAL", "EMAIL", "MONTH", "NUMBER", "SEARCH", "TEL", "TIME", "URL", "WEEK"].indexOf(elem.type.toUpperCase())!=-1);
-    else if (tag=="TEXTAREA") return true;
-    else {
-        var tmp = elem;
-        while (tmp && tmp.contentEditable=="inherit") {
-            tmp = tmp.parentElement;
-        }
-        if (tmp && tmp.contentEditable) return true;
-    }
-    return false;
-}
-
-function getAttributes(elem){
-    var attributes = {}
-    for (var att, i = 0, atts = elem.attributes, n = atts.length; i < n; i++){
-        att = atts[i];
-        attributes[att.nodeName] = att.nodeValue
-    }
-    return attributes
-}
-
-window.addEventListener("focus", function (e) {
-    """+lrectconstruct+"""
-    attributes = getAttributes(e.target)
-    if (isKeyboardElement(e.target)) __kivy__keyboard_update(true, lrect, attributes);
-}, true);
-
-window.addEventListener("blur", function (e) {
-    """+lrectconstruct+"""
-    attributes = getAttributes(e.target)
-    __kivy__keyboard_update(false, lrect, attributes);
-}, true);
-
-function __kivy__on_escape() {
-    if (document.activeElement) {
-        document.activeElement.blur();
-    }
-}
-            """
-            frame.ExecuteJavascript(jsCode)
-
-    def OnLoadEnd(self, browser, frame, httpStatusCode):
-        self.browser_widget.dispatch("on_load_end", frame, httpStatusCode)
-        #largs[0].SetZoomLevel(2.0) # this works at this point
-
-    def OnLoadError(self, browser, frame, errorCode, errorText, failedUrl):
-        self.browser_widget.dispatch("on_load_error", frame, errorCode, errorText, failedUrl)
-
-    def OnRendererProcessTerminated(self, *largs):
-        pass
-
-    # RenderHandler
-
-    def GetRootScreenRect(self, *largs):
-        pass
-
-    def GetViewRect(self, browser, rect):
-        width, height = self.browser_widget.texture.size
-        rect.append(0)
-        rect.append(0)
-        rect.append(width)
-        rect.append(height)
-        return True
-
-    def GetScreenPoint(self, *largs):
-        pass
-
-    def GetScreenInfo(self, *largs):
-        pass
-
-    def OnPopupShow(self, browser, shown):
-        self.browser_widget.remove_widget(self.browser_widget.popup)
-        if shown:
-            self.browser_widget.add_widget(self.browser_widget.popup)
-
-    def OnPopupSize(self, browser, rect):
-        self.browser_widget.popup.rpos = (rect[0], rect[1])
-        self.browser_widget.popup.size = (rect[2], rect[3])
-
-    def OnPaint(self, browser, paintElementType, dirtyRects, buf, width, height):
-        b = buf.GetString(mode="bgra", origin="top-left")
-        bw = self.browser_widget
-        if paintElementType != cefpython.PET_VIEW:
-            if bw.popup.texture.width*bw.popup.texture.height*4!=len(b):
-                return True  # prevent segfault
-            bw.popup.texture.blit_buffer(b, colorfmt='bgra', bufferfmt='ubyte')
-            bw.popup.update_rect()
-            return True
-        if bw.texture.width*bw.texture.height*4!=len(b):
-            return True  # prevent segfault
-        bw.texture.blit_buffer(b, colorfmt='bgra', bufferfmt='ubyte')
-        bw.update_rect()
-        return True
-
-    def OnCursorChange(self, *largs):
-        pass
-
-    def OnScrollOffsetChanged(self, *largs):
-        pass
-
-    # RequestHandler
-
-    def OnBeforeBrowse(self, *largs):
-        pass
-
-    def OnBeforeResourceLoad(self, *largs):
-        pass
-
-    def GetResourceHandler(self, *largs):
-        pass
-
-    def OnResourceRedirect(self, *largs):
-        pass
-
-    def GetAuthCredentials(self, *largs):
-        pass
-
-    def OnQuotaRequest(self, *largs):
-        pass
-
-    def GetCookieManager(self, browser, mainUrl):
-        cookie_manager = cefpython.CookieManager.GetGlobalManager()
-        if cookie_manager:
-            return cookie_manager
-        else:
-            print("No cookie manager found!")
-
-    def OnProtocolExecution(self, *largs):
-        pass
-
-    # RessourceHandler
 
 
 if __name__ == '__main__':
