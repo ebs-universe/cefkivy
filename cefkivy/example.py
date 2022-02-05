@@ -1,4 +1,8 @@
 
+
+from kivy.config import Config
+Config.set('kivy', 'log_level', 'debug')
+
 from cefkivy.browser import CefBrowser, cefpython
 from kivy.app import App
 

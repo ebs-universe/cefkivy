@@ -1,4 +1,5 @@
 # Import cef as first module! (it's important)
+
 import ctypes
 import sys
 import os
@@ -24,6 +25,7 @@ from kivy.properties import *
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.logger import Logger
 
 from .cefkeyboard import CefKeyboardManager
 
@@ -45,18 +47,23 @@ class CefBrowser(Widget):
     _reset_js_bindings = False  # See set_js_bindings()
     _js_bindings = None  # See set_js_bindings()
 
-    def __init__(self, *args, **kwargs):
-        super(CefBrowser, self).__init__()
-        self.url = kwargs.get("url", "")
-        self.keyboard_mode = kwargs.get("keyboard_mode", "local")
-        self.resources_dir = kwargs.get("resources_dir", "")
-        self.keyboard_above_classes = kwargs.get("keyboard_above_classes", [])
-        self.ssl_verification_disabled = kwargs.get("ssl_verification_disabled", False)
-        switches = kwargs.get("switches", {})
+    def __init__(self, **kwargs):
+        self.url = kwargs.pop("start_url", "")
+        self.keyboard_mode = kwargs.pop("keyboard_mode", "local")
+        self.resources_dir = kwargs.pop("resources_dir", "")
+        self.keyboard_above_classes = kwargs.pop("keyboard_above_classes", [])
+        self.ssl_verification_disabled = kwargs.pop("ssl_verification_disabled", False)
+        switches = kwargs.pop("switches", {})
         self.__rect = None
         self.browser = None
+        if kwargs.keys():
+            Logger.error("cefkivy: Unexpected kwargs encountered : {}".format(kwargs))
+        super(CefBrowser, self).__init__(**kwargs)
+
+        Logger.debug("cefkivy: Instantiating Browser Popup")
         self.popup = CefBrowserPopup(self)
 
+        Logger.debug("cefkivy: Creating Event Types")
         self.register_event_type("on_loading_state_change")
         self.register_event_type("on_address_change")
         self.register_event_type("on_title_change")
@@ -68,8 +75,10 @@ class CefBrowser(Widget):
         self.register_event_type("on_js_dialog")
         self.register_event_type("on_before_unload_dialog")
 
+        Logger.debug("cefkivy: Preparing the Keyboard Manager")
         self.key_manager = CefKeyboardManager(cefpython=cefpython, browser_widget=self)
 
+        Logger.debug("cefkivy: Creating the Base Texture")
         self.texture = Texture.create(size=self.size, colorfmt='rgba', bufferfmt='ubyte')
         self.texture.flip_vertical()
         with self.canvas:
@@ -77,12 +86,14 @@ class CefBrowser(Widget):
             self.__rect = Rectangle(pos=self.pos, size=self.size, texture=self.texture)
 
         md = cefpython.GetModuleDirectory()
+        Logger.debug("cefkivy: Using cefpython from <{}>".format(md))
 
         # Determine if default resources dir should be used or a custom
         if self.resources_dir:
             resources = self.resources_dir
         else:
             resources = md
+        Logger.debug("cefkivy: Using Resource Directory <{}>".format(resources))
 
         def cef_loop(*_):
             cefpython.MessageLoopWork()
@@ -97,25 +108,45 @@ class CefBrowser(Widget):
             "locales_dir_path": os.path.join(md, "locales"),
             "browser_subprocess_path": "%s/%s" % (cefpython.GetModuleDirectory(), "subprocess")
         }
+
+        Logger.debug("cefkivy: Intializing cefpython with \n"
+                     "   settings : %s \n"
+                     "   switches : %s", settings, switches)
         cefpython.Initialize(settings, switches)
 
+        # Disable Windowed rendering and and bind to parent window 0
+        # See https://github.com/cztomczak/cefpython/blob/master/api/WindowInfo.md#setasoffscreen
         windowInfo = cefpython.WindowInfo()
         windowInfo.SetAsOffscreen(0)
+
+        # Bind callback to the OnCertificateError cefpython event
         cefpython.SetGlobalClientCallback("OnCertificateError", self.on_certificate_error)
+
+        # Create the Synchronous Browser
+        Logger.debug("cefkivy: Creating the Browser")
         self.browser = cefpython.CreateBrowserSync(windowInfo, {}, navigateUrl=self.url)
 
         # Set cookie manager
+        Logger.debug("cefkivy: Creating the CookieManager")
         cookie_manager = cefpython.CookieManager.GetGlobalManager()
         cookie_path = os.path.join(resources, "cookies")
         cookie_manager.SetStoragePath(cookie_path, True)
 
         self.browser.SendFocusEvent(True)
+
+        Logger.debug("cefkivy: Creating the ClientHandler")
         ch = ClientHandler(self)
         self.browser.SetClientHandler(ch)
+
+        Logger.debug("cefkivy: Setting JS Bindings")
         self.set_js_bindings()
+
+        Logger.debug("cefkivy: Binding the Browser Size and Resizing")
         self.browser.WasResized()
         self.bind(size=self.realign)
         self.bind(pos=self.realign)
+
+        Logger.debug("cefkivy: Starting the Keyboard Manager")
         self.bind(keyboard_mode=self.set_keyboard_mode)
         if self.keyboard_mode == "global":
             self.request_keyboard()
