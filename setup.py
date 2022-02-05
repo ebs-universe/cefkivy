@@ -8,7 +8,7 @@
 from setuptools import setup
 
 install_reqs = [
-    'cefpython3',
+    'cefpython3==66.0',
     'kivy',
 ]
 
@@ -24,7 +24,7 @@ setup(name='cefkivy',
       maintainer_email="shashank@chintal.in",
       url='https://github.com/ebs-universe/cefkivy',
 
-      package_data={'cefkivy': ['images/*.png', '*.kv']},
+      package_data={'cefkivy': ['*.kv']},
 
       packages=['cefkivy', ],
 
@@ -34,6 +34,7 @@ setup(name='cefkivy',
                   'cefkivy-example = cefkivy.example:run'
             ]
       },
+      python_requires='>=3.4, <3.8',
 )
 
 # -----------------------------------------------------------------------------
