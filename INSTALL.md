@@ -53,6 +53,14 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> 
 ```
 
+Additionally, you can run the cefpython example and make sure it works by itself.
+
+```
+$ git clone https://github.com/cztomczak/cefpython.git
+$ cd cefpython/examples/
+$ python hello_world.py
+```
+
 Assuming it worked so far, install `cefkivy-ebs` and run the example provided in the repository to ensure it works. 
 
 ```

@@ -45,13 +45,14 @@ class CefBrowser(Widget):
     _reset_js_bindings = False  # See set_js_bindings()
     _js_bindings = None  # See set_js_bindings()
 
-    def __init__(self, *largs, **dargs):
+    def __init__(self, *args, **kwargs):
         super(CefBrowser, self).__init__()
-        self.url = dargs.get("url", "")
-        self.keyboard_mode = dargs.get("keyboard_mode", "local")
-        self.resources_dir = dargs.get("resources_dir", "")
-        self.keyboard_above_classes = dargs.get("keyboard_above_classes", [])
-        switches = dargs.get("switches", {})
+        self.url = kwargs.get("url", "")
+        self.keyboard_mode = kwargs.get("keyboard_mode", "local")
+        self.resources_dir = kwargs.get("resources_dir", "")
+        self.keyboard_above_classes = kwargs.get("keyboard_above_classes", [])
+        self.ssl_verification_disabled = kwargs.get("ssl_verification_disabled", False)
+        switches = kwargs.get("switches", {})
         self.__rect = None
         self.browser = None
         self.popup = CefBrowserPopup(self)
@@ -83,24 +84,24 @@ class CefBrowser(Widget):
         else:
             resources = md
 
-        def cef_loop(*largs):
+        def cef_loop(*_):
             cefpython.MessageLoopWork()
         Clock.schedule_interval(cef_loop, 0)
 
         settings = {
-                    #"debug": True,
-                    "log_severity": cefpython.LOGSEVERITY_INFO,
-                    #"log_file": "debug.log",
-                    "persist_session_cookies": True,
-                    "release_dcheck_enabled": True,  # Enable only when debugging.
-                    "locales_dir_path": os.path.join(md, "locales"),
-                    "browser_subprocess_path": "%s/%s" % (cefpython.GetModuleDirectory(), "subprocess")
-                }
+            # "debug": True,
+            "log_severity": cefpython.LOGSEVERITY_INFO,
+            # "log_file": "debug.log",
+            "persist_session_cookies": True,
+            "release_dcheck_enabled": True,  # Enable only when debugging.
+            "locales_dir_path": os.path.join(md, "locales"),
+            "browser_subprocess_path": "%s/%s" % (cefpython.GetModuleDirectory(), "subprocess")
+        }
         cefpython.Initialize(settings, switches)
 
         windowInfo = cefpython.WindowInfo()
         windowInfo.SetAsOffscreen(0)
-        cefpython.SetGlobalClientCallback("OnCertificateError", self.OnCertificateError)
+        cefpython.SetGlobalClientCallback("OnCertificateError", self.on_certificate_error)
         self.browser = cefpython.CreateBrowserSync(windowInfo, {}, navigateUrl=self.url)
 
         # Set cookie manager
@@ -140,7 +141,7 @@ class CefBrowser(Widget):
             self._js_bindings.SetFunction("__kivy__keyboard_update", self.keyboard_update)
         self.browser.SetJavascriptBindings(self._js_bindings)
 
-    def realign(self, *largs):
+    def realign(self, *_):
         ts = self.texture.size
         ss = self.size
         schg = (ts[0] != ss[0] or ts[1] != ss[1])
@@ -176,7 +177,7 @@ class CefBrowser(Widget):
             self.browser.Navigate(self.url)
             self._reset_js_bindings = True
 
-    def set_keyboard_mode(self, *largs):
+    def set_keyboard_mode(self, *_):
         if self.keyboard_mode == "global":
             self.request_keyboard()
         else:
@@ -192,18 +193,26 @@ class CefBrowser(Widget):
         pass
 
     def on_before_popup(self, browser, frame, targetUrl, targetFrameName,
-            popupFeatures, windowInfo, client, browserSettings, noJavascriptAccess):
+                        popupFeatures, windowInfo, client, browserSettings,
+                        noJavascriptAccess):
         pass
 
-    def on_js_dialog(self, browser, origin_url, accept_lang, dialog_type, message_text, default_prompt_text, callback,
+    def on_js_dialog(self, browser, origin_url, accept_lang, dialog_type,
+                     message_text, default_prompt_text, callback,
                      suppress_message):
         pass
 
     def on_before_unload_dialog(self, browser, message_text, is_reload, callback):
         pass
 
-    def on_certificate_error(self):
-        pass
+    def on_certificate_error(self, err, url, cb):
+        print(err, url, cb)
+        # Check if cert verification is disabled
+        if self.ssl_verification_disabled:
+            cb.Continue(True)
+        else:
+            cb.Continue(False)
+            self.dispatch("on_certificate_error")
 
     def on_load_start(self, frame):
         pass
@@ -212,17 +221,9 @@ class CefBrowser(Widget):
         pass
 
     def on_load_error(self, frame, errorCode, errorText, failedUrl):
-        print("on_load_error=> Code: %s, errorText: %s, failedURL: %s" % (errorCode, errorText, failedUrl))
+        print("on_load_error=> Code: %s, errorText: %s, failedURL: %s"
+              % (errorCode, errorText, failedUrl))
         pass
-
-    def OnCertificateError(self, err, url, cb):
-        print(err, url, cb)
-        # Check if cert verification is disabled
-        if os.path.isfile("/etc/rentouch/ssl-verification-disabled"):
-            cb.Continue(True)
-        else:
-            cb.Continue(False)
-            self.dispatch("on_certificate_error")
 
     __keyboard = None
 
@@ -305,11 +306,11 @@ class CefBrowser(Widget):
         self.__keyboard.release()
         self.__keyboard = None
 
-    def on_key_down(self, *largs):
-        self.key_manager.kivy_on_key_down(self.browser, *largs)
+    def on_key_down(self, *args):
+        self.key_manager.kivy_on_key_down(self.browser, *args)
 
-    def on_key_up(self, *largs):
-        self.key_manager.kivy_on_key_up(self.browser, *largs)
+    def on_key_up(self, *args):
+        self.key_manager.kivy_on_key_up(self.browser, *args)
 
     def go_back(self):
         self.browser.GoBack()
@@ -332,7 +333,7 @@ class CefBrowser(Widget):
         if self.keyboard_mode == "global":
             self.request_keyboard()
         else:
-           Window.release_all_keyboards()
+            Window.release_all_keyboards()
 
         touch.is_dragging = False
         touch.is_scrolling = False
@@ -380,19 +381,19 @@ class CefBrowser(Widget):
             if not touch.is_scrolling:
                 # Right click (mouse down, mouse up)
                 self.touches[0].is_right_click = self.touches[1].is_right_click = True
-                self.browser.SendMouseClickEvent(x, y, cefpython.MOUSEBUTTON_RIGHT,
-                                                 mouseUp=False, clickCount=1
-                                                 )
-                self.browser.SendMouseClickEvent(x, y, cefpython.MOUSEBUTTON_RIGHT,
-                                                 mouseUp=True, clickCount=1
-                                                 )
+                self.browser.SendMouseClickEvent(
+                    x, y, cefpython.MOUSEBUTTON_RIGHT,
+                    mouseUp=False, clickCount=1
+                )
+                self.browser.SendMouseClickEvent(
+                    x, y, cefpython.MOUSEBUTTON_RIGHT,
+                    mouseUp=True, clickCount=1
+                )
         else:
             if touch.is_dragging:
                 # Drag end (mouse up)
                 self.browser.SendMouseClickEvent(
-                    x,
-                    y,
-                    cefpython.MOUSEBUTTON_LEFT,
+                    x, y, cefpython.MOUSEBUTTON_LEFT,
                     mouseUp=True, clickCount=1
                 )
             elif not touch.is_right_click:
@@ -401,15 +402,11 @@ class CefBrowser(Widget):
                 if touch.is_double_tap:
                     count = 2
                 self.browser.SendMouseClickEvent(
-                    x,
-                    y,
-                    cefpython.MOUSEBUTTON_LEFT,
+                    x, y, cefpython.MOUSEBUTTON_LEFT,
                     mouseUp=False, clickCount=count
                 )
                 self.browser.SendMouseClickEvent(
-                    x,
-                    y,
-                    cefpython.MOUSEBUTTON_LEFT,
+                    x, y, cefpython.MOUSEBUTTON_LEFT,
                     mouseUp=True, clickCount=count
                 )
 
@@ -423,7 +420,7 @@ class CefBrowserPopup(Widget):
     ry = NumericProperty(0)
     rpos = ReferenceListProperty(rx, ry)
 
-    def __init__ (self, parent, *largs, **dargs):
+    def __init__ (self, parent, *args, **kwargs):
         super(CefBrowserPopup, self).__init__()
         self.browser_widget = parent
         self.__rect = None

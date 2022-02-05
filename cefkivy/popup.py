@@ -105,7 +105,7 @@ class PopupController(object):
 
     def on_before_popup(self, obj, browser, frame, targetUrl, targetFrameName,
                         popupFeatures, windowInfo, client, browserSettings, noJavascriptAccess):
-        print windowInfo, popupFeatures, targetFrameName
+        print(windowInfo, popupFeatures, targetFrameName)
         self.popup.url = targetUrl
         self.popup.open()
 
