@@ -51,6 +51,29 @@ production setting - please reach out to me and let me know by email at
 shashank at chintal dot in. The number of users, if any, is likely to 
 determine how much effort I will put into maintaining this.
 
+
+Current Status
+==============
+
+### Next
+
+Development is continuing in the background as of February 2022.
+The next release, with further fixes for basic functionality, should be 
+published by the end of March 2022. 
+
+### v66.0.1, February 2022
+
+  - Package installs fine on x86-64 and seems to basically run.
+  - Application exit hangs. There probably needs to be an exit handler 
+   or the shutdown callbacks need to be fixed.
+  - Keyboard key-presses seem to work in popups but not in the main 
+   browser widget. This needs to be fixed.
+  - Virtual keyboard has not been seen. The code suggests it should have 
+   appeared on its own, but it has not. This is yet to be investigated.
+  - This version is a cleaned up and updated version of upstream with 
+   no significant structural or functional changes. Cosmetic changes
+   (refacoring) intended to support maintainability have been done. 
+
 Original README.md 
 ------------------
 
