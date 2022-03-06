@@ -61,6 +61,14 @@ Gradual development is continuing in the background as of February 2022.
 The next release, with further fixes for basic functionality, should be 
 published by the end of March 2022. 
 
+  - JS in the LoadHandler stripped out completely to debug the keyboard 
+    issue. This may eventually be reintroduced, but for now, it's not there.
+  - Keyboard issue tracked down to KeyEvent dictionary structure having been 
+    changed in cefpython3. Additional code needed to correctly translate 
+    key presses.
+  - Keyboard made 'global' by default to simplify testing.
+  - Application seems to exit fine now, uncertain why.
+
 ### v66.0.1, February 2022
 
   - Package installs fine on x86-64 and seems to basically run.

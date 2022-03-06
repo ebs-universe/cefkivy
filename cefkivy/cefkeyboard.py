@@ -31,7 +31,7 @@ class CefKeyboardManager():
         self.is_alt2 = False
     
     def kivy_on_key_down(self, browser, keyboard, keycode, text, modifiers):
-        #print "\non_key_down:", keycode, text, modifiers
+        # print("\non_key_down:", keycode, text, modifiers)
         if keycode[0] == 27:
             # On escape release the keyboard
             self.browser_widget.release_keyboard()
@@ -66,11 +66,16 @@ class CefKeyboardManager():
         if cef_key_code == 65293:
             event_type = self.cefpython.KEYEVENT_CHAR
 
-        key_event = {"type": event_type,
-                     "native_key_code": cef_key_code,
-                     "modifiers": cef_modifiers
-                     }
-        #print("keydown keyEvent: %s" % key_event)
+        key_event = {
+            "type": event_type,
+            "native_key_code": cef_key_code,
+            "modifiers": cef_modifiers,
+            "is_system_key": False,
+            "windows_key_code": 65,
+            "character": ord('a'),
+            "unmodified_character": ord('a'),
+        }
+        print("keydown keyEvent: %s" % key_event)
         browser.SendKeyEvent(key_event)
 
         if keycode[0] == 304:
@@ -87,7 +92,7 @@ class CefKeyboardManager():
             self.is_alt2 = True
 
     def kivy_on_key_up(self, browser, keyboard, keycode):
-        #print("\non_key_up(): keycode = %s" % (keycode,))
+        # print("\non_key_up(): keycode = %s" % (keycode,))
         cef_modifiers = self.cefpython.EVENTFLAG_NONE
         if self.is_shift1 or self.is_shift2:
             cef_modifiers |= self.cefpython.EVENTFLAG_SHIFT_DOWN
@@ -100,10 +105,13 @@ class CefKeyboardManager():
 
         # Only send KEYEVENT_KEYUP if its a special (enter, tab ...)
         if not cef_key_code == keycode[0]:
-            key_event = {"type": self.cefpython.KEYEVENT_KEYUP,
-                        "native_key_code": cef_key_code,
-                        "modifiers": cef_modifiers
-                        }
+            key_event = {
+                "type": self.cefpython.KEYEVENT_KEYUP,
+                "native_key_code": cef_key_code,
+                "modifiers": cef_modifiers,
+                "is_system_key": False,
+                "windows_key_code": cef_key_code,
+            }
             browser.SendKeyEvent(key_event)
 
         if keycode[0] == 304:
@@ -123,33 +131,33 @@ class CefKeyboardManager():
         cef_keycode = keycode
         other_keys_map = {
             # Escape
-            "27":65307,
+            "27": 65307,
             # F1-F12
-            "282":65470, "283":65471, "284":65472, "285":65473,
-            "286":65474, "287":65475, "288":65476, "289":65477,
-            "290":65478, "291":65479, "292":65480, "293":65481,
+            "282": 65470, "283": 65471, "284": 65472, "285": 65473,
+            "286": 65474, "287": 65475, "288": 65476, "289": 65477,
+            "290": 65478, "291": 65479, "292": 65480, "293": 65481,
             # Tab
-            "9":65289,
+            "9": 65289,
             # Left Shift, Right Shift
-            "304":65505, "303":65506,
+            "304": 65505, "303": 65506,
             # Left Ctrl, Right Ctrl
-            "306":65507, "305": 65508,
+            "306": 65507, "305": 65508,
             # Left Alt, Right Alt
-            "308":65513, "313":65027,
+            "308": 65513, "313": 65027,
             # Backspace
-            "8":65288,
+            "8": 65288,
             # Enter
-            "13":65293,
+            "13": 65293,
             # PrScr, ScrLck, Pause
-            "316":65377, "302":65300, "19":65299,
+            "316": 65377, "302": 65300, "19": 65299,
             # Insert, Delete,
             # Home, End,
             # Pgup, Pgdn
-            "277":65379, "127":65535,
-            "278":65360, "279":65367,
-            "280":65365, "281":65366,
+            "277": 65379, "127": 65535,
+            "278": 65360, "279": 65367,
+            "280": 65365, "281": 65366,
             # Arrows (left, up, right, down)
-            "276":65361, "273":65362, "275":65363, "274":65364,
+            "276": 65361, "273": 65362, "275": 65363, "274": 65364,
         }
         if str(keycode) in other_keys_map:
             cef_keycode = other_keys_map[str(keycode)]
@@ -171,4 +179,5 @@ class FixedKeyboard(VKeyboard):
             return
         self.center_x = Window.width/2
         self.y = 230
+
 Window.set_vkeyboard_class(FixedKeyboard)

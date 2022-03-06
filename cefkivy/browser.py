@@ -44,7 +44,7 @@ class CefBrowser(Widget):
     # 1. Global mode forwards keys to CEF all the time.
     # 2. Local mode forwards keys to CEF only when an editable
     #    control is focused (input type=text|password or textarea).
-    keyboard_mode = OptionProperty("local", options=("global", "local"))
+    keyboard_mode = OptionProperty("global", options=("global", "local"))
     url = StringProperty("about:blank")
     current_url = StringProperty("")
     resources_dir = StringProperty("")
@@ -70,7 +70,7 @@ class CefBrowser(Widget):
     def __init__(self, **kwargs):
         switches = kwargs.pop("switches", {})
         self.url = kwargs.pop("start_url", "")
-        self.keyboard_mode = kwargs.pop("keyboard_mode", "local")
+        self.keyboard_mode = kwargs.pop("keyboard_mode", "global")
         self.resources_dir = kwargs.pop("resources_dir", "")
         self.keyboard_above_classes = kwargs.pop("keyboard_above_classes", [])
         self.ssl_verification_disabled = kwargs.pop("ssl_verification_disabled", False)
@@ -368,9 +368,11 @@ class CefBrowser(Widget):
         self.__keyboard = None
 
     def on_key_down(self, *args):
+        print("Kivy Down Event : ", args)
         self.key_manager.kivy_on_key_down(self.browser, *args)
 
     def on_key_up(self, *args):
+        print("Kivy Up Event : ", args)
         self.key_manager.kivy_on_key_up(self.browser, *args)
 
     def go_back(self):
