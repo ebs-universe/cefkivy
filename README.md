@@ -62,10 +62,11 @@ The next release, with further fixes for basic functionality, should be
 published by the end of March 2022. 
 
   - JS in the LoadHandler stripped out completely to debug the keyboard 
-    issue. This may eventually be reintroduced, but for now, it's not there.
+    issue. This may eventually be reintroduced, but for now, it's not there. It
+    seems likely it will be needed for a virtual keyboard.
   - Keyboard issue tracked down to KeyEvent dictionary structure having been 
-    changed in cefpython3. Additional code needed to correctly translate 
-    key presses.
+    changed in cefpython3. A horribly messy keycode translation layer has 
+    been added and keyboard input sort of works on unix.  
   - Keyboard made 'global' by default to simplify testing.
   - Application seems to exit fine now, uncertain why.
 

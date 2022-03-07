@@ -368,11 +368,11 @@ class CefBrowser(Widget):
         self.__keyboard = None
 
     def on_key_down(self, *args):
-        print("Kivy Down Event : ", args)
+        # print("Kivy Down Event : ", args)
         self.key_manager.kivy_on_key_down(self.browser, *args)
 
     def on_key_up(self, *args):
-        print("Kivy Up Event : ", args)
+        # print("Kivy Up Event : ", args)
         self.key_manager.kivy_on_key_up(self.browser, *args)
 
     def go_back(self):
