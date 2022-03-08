@@ -59,8 +59,11 @@ Current Status
 
 Gradual development is continuing in the background as of February 2022.
 The next release, with further fixes for basic functionality, should be 
-published by the end of March 2022. 
+published by the end of April 2022. 
 
+### v66.0.2, March 2022
+
+  - Touch, virtual keyboard not yet tested.
   - JS in the LoadHandler stripped out completely to debug the keyboard 
     issue. This may eventually be reintroduced, but for now, it's not there. It
     seems likely it will be needed for a virtual keyboard.
