@@ -97,7 +97,7 @@ class CefKeyboardManager():
                 "unmodified_character": ord(unmodified_character),
             })
 
-        print("keydown keyEvent: %s" % key_event)
+        # print("keydown keyEvent: %s" % key_event)
         browser.SendKeyEvent(key_event)
 
         if keycodes.get_character_native(native_key_code) == 'lshift':

@@ -126,7 +126,8 @@ class CefBrowser(Widget):
             "persist_session_cookies": True,
             # "release_dcheck_enabled": True,  # Enable only when debugging.
             "locales_dir_path": os.path.join(md, "locales"),
-            "browser_subprocess_path": "%s/%s" % (cefpython.GetModuleDirectory(), "subprocess")
+            "browser_subprocess_path": "%s/%s" % (cefpython.GetModuleDirectory(), "subprocess"),
+            'background_color': 0xFFFFFFFF,
         }
 
         Logger.debug("cefkivy: Intializing cefpython with \n"
