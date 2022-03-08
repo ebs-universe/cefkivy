@@ -262,9 +262,11 @@ class CefBrowser(Widget):
     def on_title_change(self, newTitle):
         pass
 
-    def on_before_popup(self, browser, frame, targetUrl, targetFrameName,
-                        popupFeatures, windowInfo, client, browserSettings,
-                        noJavascriptAccess):
+    def on_before_popup(self, browser, frame, target_url, target_frame_name, target_disposition,
+                        user_gesture, popup_features, window_info_out, client, browser_settings_out,
+                        no_javascript_access_out):
+        # TODO Implement popups here. Suppressed for now.
+        print("Opening Popup : ", target_url, user_gesture, target_disposition)
         pass
 
     def on_certificate_error(self, err, url, cb):
