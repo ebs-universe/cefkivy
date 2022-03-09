@@ -9,6 +9,7 @@ import setuptools
 from setuptools import setup
 
 install_reqs = [
+    'kivy_garden.frostedglass',
     'cefpython3==66.0',
     'kivy',
 ]

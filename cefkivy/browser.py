@@ -76,14 +76,16 @@ class CefBrowser(Widget):
         self.ssl_verification_disabled = kwargs.pop("ssl_verification_disabled", False)
         self.__rect = None
         self.browser = None
+        self._dialog_target = kwargs.pop('dialog_target', None)
+        self._current_dialog = None
         if kwargs.keys():
             Logger.error("cefkivy: Unexpected kwargs encountered : {}".format(kwargs))
         super(CefBrowser, self).__init__(**kwargs)
 
         self.check_versions()
 
-        Logger.debug("cefkivy: Instantiating Browser Popup")
-        self.popup = CefBrowserPopup(self)
+        # Logger.debug("cefkivy: Instantiating Browser Popup")
+        # self.popup = CefBrowserPopup(self)
 
         # Create Event Types
         self.register_event_type("on_loading_state_change")
@@ -291,6 +293,38 @@ class CefBrowser(Widget):
 
     __keyboard = None
 
+    @property
+    def dialog_target(self):
+        return self._dialog_target
+
+    @dialog_target.setter
+    def dialog_target(self, value):
+        self._dialog_target = value
+
+    def dialog_finish(self, dialog):
+        self.dialog_target.remove_widget(self._current_dialog)
+        self.disabled = False
+        self.opacity = 1
+        self._current_dialog = None
+
+    def dialog_show(self, dialog):
+        print("Trying to show ", dialog)
+
+        if not self.dialog_target:
+            print("WARNING: Dialog Target not Specified. Auto Accepting!")
+            dialog.skip()
+            return
+
+        if self._current_dialog:
+            dialog.cancel()
+            return
+
+        self._current_dialog = dialog.build()
+        dialog.when_done = self.dialog_finish
+        self.opacity = 0.3
+        self.disabled = True
+        self.dialog_target.add_widget(self._current_dialog)
+
     def keyboard_update(self, shown, rect, attributes):
         """
         :param shown: Show keyboard if true, hide if false (blur)
@@ -394,6 +428,8 @@ class CefBrowser(Widget):
             print("No cookie manager found!, Can't delete cookie(s)")
 
     def on_touch_down(self, touch, *kwargs):
+        if self.disabled:
+            return
         if not self.collide_point(*touch.pos):
             return
         if self.keyboard_mode == "global":
@@ -481,46 +517,46 @@ class CefBrowser(Widget):
         return True
 
 
-class CefBrowserPopup(Widget):
-    rx = NumericProperty(0)
-    ry = NumericProperty(0)
-    rpos = ReferenceListProperty(rx, ry)
-
-    def __init__ (self, parent, *args, **kwargs):
-        super(CefBrowserPopup, self).__init__()
-        self.browser_widget = parent
-        self.__rect = None
-        self.texture = Texture.create(size=self.size, colorfmt='rgba', bufferfmt='ubyte')
-        self.texture.flip_vertical()
-        with self.canvas:
-            Color(1, 1, 1)
-            self.__rect = Rectangle(pos=self.pos, size=self.size, texture=self.texture)
-        self.bind(rpos=self.realign)
-        self.bind(size=self.realign)
-        parent.bind(pos=self.realign)
-        parent.bind(size=self.realign)
-
-    def realign(self, *args):
-        self.x = self.rx+self.browser_widget.x
-        self.y = self.browser_widget.height-self.ry-self.height+self.browser_widget.y
-        ts = self.texture.size
-        ss = self.size
-        schg = (ts[0] != ss[0] or ts[1] != ss[1])
-        if schg:
-            self.texture = Texture.create(size=self.size, colorfmt='rgba', bufferfmt='ubyte')
-            self.texture.flip_vertical()
-        if self.__rect:
-            with self.canvas:
-                Color(1, 1, 1)
-                self.__rect.pos = self.pos
-                if schg:
-                    self.__rect.size = self.size
-            if schg:
-                self.update_rect()
-
-    def update_rect(self):
-        if self.__rect:
-            self.__rect.texture = self.texture
+# class CefBrowserPopup(Widget):
+#     rx = NumericProperty(0)
+#     ry = NumericProperty(0)
+#     rpos = ReferenceListProperty(rx, ry)
+#
+#     def __init__(self, parent, *args, **kwargs):
+#         super(CefBrowserPopup, self).__init__()
+#         self.browser_widget = parent
+#         self.__rect = None
+#         self.texture = Texture.create(size=self.size, colorfmt='rgba', bufferfmt='ubyte')
+#         self.texture.flip_vertical()
+#         with self.canvas:
+#             Color(1, 1, 1)
+#             self.__rect = Rectangle(pos=self.pos, size=self.size, texture=self.texture)
+#         self.bind(rpos=self.realign)
+#         self.bind(size=self.realign)
+#         parent.bind(pos=self.realign)
+#         parent.bind(size=self.realign)
+#
+#     def realign(self, *args):
+#         self.x = self.rx+self.browser_widget.x
+#         self.y = self.browser_widget.height-self.ry-self.height+self.browser_widget.y
+#         ts = self.texture.size
+#         ss = self.size
+#         schg = (ts[0] != ss[0] or ts[1] != ss[1])
+#         if schg:
+#             self.texture = Texture.create(size=self.size, colorfmt='rgba', bufferfmt='ubyte')
+#             self.texture.flip_vertical()
+#         if self.__rect:
+#             with self.canvas:
+#                 Color(1, 1, 1)
+#                 self.__rect.pos = self.pos
+#                 if schg:
+#                     self.__rect.size = self.size
+#             if schg:
+#                 self.update_rect()
+#
+#     def update_rect(self):
+#         if self.__rect:
+#             self.__rect.texture = self.texture
 
 
 if __name__ == '__main__':
