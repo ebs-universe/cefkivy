@@ -61,6 +61,8 @@ Gradual development is continuing in the background as of February 2022.
 The next release, with further fixes for basic functionality, should be 
 published by the end of April 2022. 
 
+### v66.0.3, March 2022
+
   - Core support for message box-style dialogs implemented.
   - JS Dialogs implemented.
   - Block Messages implemented.
