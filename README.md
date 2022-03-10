@@ -63,6 +63,7 @@ published by the end of April 2022.
 
   - Core support for message box-style dialogs implemented.
   - JS Dialogs implemented.
+  - Block Messages implemented.
   - Popups suppressed entirely.
 
 ### v66.0.2, March 2022
