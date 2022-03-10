@@ -85,13 +85,18 @@ _by_windows = {
 def get_unix_keycode(character):
     return _by_char[character][0]
 
+
 def get_windows_keycode(character):
     return _by_char[character][1]
+
 
 def get_native_keycode(character):
     return get_unix_keycode(character)
 
-def get_character_unix(unix, modifiers=[]):
+
+def get_character_unix(unix, modifiers=None):
+    if not modifiers:
+        modifiers = []
     if unix not in _by_unix.keys():
         return chr(unix)
     spec = _by_unix[unix]
@@ -105,35 +110,43 @@ def get_character_unix(unix, modifiers=[]):
                 shift_applies = True
         else:
             if ('shift' in modifiers and not 'capslock' in modifiers)\
-                or ('capslock' in modifiers and not 'shift' in modifiers):
+                    or ('capslock' in modifiers and not 'shift' in modifiers):
                 shift_applies = True
     if shift_applies:
         if offset and len(character) == 1:
             character = chr(ord(character) + offset)
     return character
 
-def get_character_windows(windows, modifiers=[]):
+
+def get_character_windows(windows, modifiers=None):
     return _by_windows[windows][0]
 
-def get_character_native(native, modifiers=[]):
+
+def get_character_native(native, modifiers=None):
     return get_character_unix(native, modifiers)
+
 
 def get_unix_from_windows(windows):
     return _by_windows[windows][1]
 
+
 def get_windows_from_unix(unix):
     return _by_unix[unix][1]
+
 
 def get_windows_from_native(native):
     return get_windows_from_unix(native)
 
+
 def get_unix_from_native(native):
     return native
+
 
 def check_is_special(native):
     if native not in _by_unix.keys():
         return False
     return _by_unix[native][2]
+
 
 if __name__ == '__main__':
     for spec in _codes:
