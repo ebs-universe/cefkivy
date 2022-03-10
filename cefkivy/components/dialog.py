@@ -5,6 +5,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 # TODO Make the ebs dependency installable or just include the code directly
 from ebs.iot.linuxnode.widgets.colors import ColorBoxLayout
+from ebs.iot.linuxnode.widgets.labels import WrappingLabel
 
 
 class MessageDialogBase(object):
@@ -33,20 +34,30 @@ class MessageDialogBase(object):
             title = Label(text=self._title, color=self._fgcolor)
             dialog_widget.add_widget(title)
 
-        rich_layout = BoxLayout(orientation='horizontal')
+        rich_layout = BoxLayout(orientation='horizontal', size_hint_y=None)
         if self._icon:
             pass
 
-        uix_layout = BoxLayout(orientation='vertical', spacing=10, padding=[10])
-        label = Label(text=self._message_text, color=self._fgcolor)
+        uix_layout = BoxLayout(orientation='vertical', spacing=10, padding=[10], size_hint_y=None)
+        label = WrappingLabel(text=self._message_text, color=self._fgcolor, size_hint=(1, None))
         uix_layout.add_widget(label)
+
         if self._user_input:
             pass
 
+        def _uix_resize(_, l_h):
+            uix_layout.height = l_h + 20
+        label.bind(height=_uix_resize)
+
         rich_layout.add_widget(uix_layout)
+
+        def _rich_resize(_, u_h):
+            rich_layout.height = u_h
+        uix_layout.bind(height=_rich_resize)
+
         dialog_widget.add_widget(rich_layout)
 
-        button_layout = BoxLayout(orientation='horizontal', spacing=10)
+        button_layout = BoxLayout(orientation='horizontal', spacing=10, height=35)
         for text, action in self._button_specs:
             lbutton = Button(text=text)
             lbutton.bind(on_press=action)
@@ -54,6 +65,9 @@ class MessageDialogBase(object):
 
         dialog_widget.add_widget(button_layout)
 
+        def _dialog_resize(_, r_h):
+            dialog_widget.height = r_h + 35 + title.height + 20
+        rich_layout.bind(height=_dialog_resize)
         return dialog_widget
 
     def skip(self):
