@@ -37,6 +37,7 @@ from .handlers.lifespan import LifespanHandler
 from .handlers.load import LoadHandler
 from .handlers.render import RenderHandler
 from .handlers.request import RequestHandler
+from .components.blockdialog import PopupBlockDialog
 
 
 class CefBrowser(Widget):
@@ -269,7 +270,10 @@ class CefBrowser(Widget):
                         no_javascript_access_out):
         # TODO Implement popups here. Suppressed for now.
         print("Opening Popup : ", target_url, user_gesture, target_disposition)
-        pass
+        block_dialog = PopupBlockDialog(browser=self.browser, callback=None,
+                                        message_text=target_url)
+        self.dialog_show(block_dialog)
+        return True
 
     def on_certificate_error(self, err, url, cb):
         print(err, url, cb)
@@ -308,7 +312,6 @@ class CefBrowser(Widget):
         self._current_dialog = None
 
     def dialog_show(self, dialog):
-        print("Trying to show ", dialog)
 
         if not self.dialog_target:
             print("WARNING: Dialog Target not Specified. Auto Accepting!")

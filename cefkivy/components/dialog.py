@@ -1,5 +1,6 @@
 
 
+from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -11,7 +12,7 @@ from ebs.iot.linuxnode.widgets.labels import WrappingLabel
 class MessageDialogBase(object):
     def __init__(self, browser, message_text, callback,
                  button_specs=None, user_input=False, when_done=None, title=None,
-                 bgcolor=None, icon=None, fgcolor=None):
+                 bgcolor=None, icon=None, fgcolor=None, autoclose=0):
         self._when_done = when_done
         self._browser = browser
         self._message_text = message_text
@@ -22,8 +23,19 @@ class MessageDialogBase(object):
         self._button_specs = button_specs or []
         self._user_input = user_input
         self._title = title
+        self._autoclose = autoclose
+        self._finished = False
 
     def build(self):
+        if self._autoclose:
+            self._message_text = self._message_text + \
+                                 "\nThis message will close in {} seconds.".format(self._autoclose)
+
+            def _autoclose(*_):
+                if not self._finished:
+                    self.cancel()
+            Clock.schedule_once(_autoclose, self._autoclose)
+
         dialog_widget = ColorBoxLayout(
             bgcolor=self._bgcolor, orientation='vertical',
             size_hint=(0.5, None), pos_hint={'center_x': 0.5, 'center_y': 0.5},
@@ -68,20 +80,25 @@ class MessageDialogBase(object):
         def _dialog_resize(_, r_h):
             dialog_widget.height = r_h + 35 + title.height + 20
         rich_layout.bind(height=_dialog_resize)
+        self._finished = False
         return dialog_widget
 
     def skip(self):
         self.ok()
 
     def cancel(self, *_):
+        self._finished = True
         if self._when_done:
             self._when_done(self)
-        self._callback(False)
+        if self._callback:
+            self._callback(False)
 
     def ok(self, *_):
+        self._finished = True
         if self._when_done:
             self._when_done(self)
-        self._callback(True)
+        if self._callback:
+            self._callback(True)
 
     @property
     def when_done(self):

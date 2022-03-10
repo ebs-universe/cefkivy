@@ -25,7 +25,6 @@ class JavascriptDialogHandler(ClientHandlerBase):
         elif dialog_type == cefpython.JSDIALOGTYPE_PROMPT:
             kwargs['default_prompt_text'] = default_prompt_text
             dialog = jsdialog.JSDialogPrompt(**kwargs)
-        print(kwargs)
         if dialog:
             self._widget.dialog_show(dialog)
         suppress_message_out.append(True)
