@@ -1,19 +1,18 @@
-
-
 from kivy.uix.widget import Widget
 from cefpython3.cefpython_py37 import PyBrowser
 from ..browser import cefpython
 
 
-class TouchProcessor(object):
-    def __init__(self, widget: Widget, browser: PyBrowser):
+class KivyTouchProcessor(object):
+    def __init__(self, widget: Widget = None, **kwargs):
+        if not widget:
+            raise AttributeError("Widget is a required argument")
         self._touches = []
         self._widget = widget
-        self._browser = browser
         self._mouse_scroll_step = 40
-        self._enable_dragging = False
-        self._enable_right_click = False
-        self._debug_touch = False
+        self._enable_dragging = kwargs.pop('enable_dragging', False)
+        self._enable_right_click = kwargs.pop('enable_right_click', False)
+        self._debug_touch = kwargs.pop('debug_touch', False)
 
     def _print_current_touches(self):
         print("Current Touches :")
@@ -150,10 +149,41 @@ class TouchProcessor(object):
                 else:
                     self._dispatch_single_click_event(x, y)
             elif touch.is_right_click or touch.button == 'right':
-                print("Here")
                 self._dispatch_right_click_event(x, y)
         self._touch_finish(touch)
         return True
+
+    def _dispatch_click_event(self, x, y, count):
+        raise NotImplementedError
+
+    def _dispatch_single_click_event(self, x, y):
+        self._dispatch_click_event(x, y, 1)
+
+    def _dispatch_double_click_event(self, x, y):
+        self._dispatch_click_event(x, y, 2)
+
+    def _dispatch_scroll_event(self, x, y, dx, dy):
+        raise NotImplementedError
+
+    def _dispatch_drag_start_event(self, x, y):
+        raise NotImplementedError
+
+    def _dispatch_drag_move_event(self, x, y):
+        raise NotImplementedError
+
+    def _dispatch_drag_end_event(self, x, y):
+        raise NotImplementedError
+
+    def _dispatch_right_click_event(self, x, y):
+        raise NotImplementedError
+
+
+class CefTouchProcessor(KivyTouchProcessor):
+    def __init__(self, browser: PyBrowser = None, **kwargs):
+        if not browser:
+            raise AttributeError("Browser is a required argument")
+        super(CefTouchProcessor, self).__init__(**kwargs)
+        self._browser = browser
 
     def _dispatch_click_event(self, x, y, count):
         # Left Mouse Down, Left Mouse Up
@@ -165,12 +195,6 @@ class TouchProcessor(object):
             x, y, cefpython.MOUSEBUTTON_LEFT,
             mouseUp=True, clickCount=count
         )
-
-    def _dispatch_single_click_event(self, x, y):
-        self._dispatch_click_event(x, y, 1)
-
-    def _dispatch_double_click_event(self, x, y):
-        self._dispatch_click_event(x, y, 2)
 
     def _dispatch_scroll_event(self, x, y, dx, dy):
         self._browser.SendMouseWheelEvent(x, y, dx, dy)

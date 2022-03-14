@@ -1,11 +1,11 @@
 
 
-from ..inputs.touch import TouchProcessor
+from ..inputs.touch import CefTouchProcessor
 
 
 class TouchMixin(object):
     def __init__(self):
-        self._touch_processor = TouchProcessor(self, self.browser)
+        self._touch_processor = CefTouchProcessor(widget=self, browser=self.browser)
 
     def on_touch_down(self, touch, **kwargs):
         self._touch_processor.on_touch_down(touch, **kwargs)
