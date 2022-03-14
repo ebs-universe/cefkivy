@@ -6,8 +6,8 @@ class LoadHandler(ClientHandlerBase):
     # https://github.com/cztomczak/cefpython/blob/master/api/LoadHandler.md
     def OnLoadingStateChange(self, browser, is_loading, can_go_back, can_go_forward):
         self._widget.dispatch("on_loading_state_change", is_loading, can_go_back, can_go_forward)
-        # if self._widget.reset_js_bindings and not is_loading:
-        #     self._widget.set_js_bindings()
+        if self._widget.reset_js_bindings and not is_loading:
+            self._widget.set_js_bindings()
         if is_loading and self._widget.keyboard_mode == "local":
             # Release keyboard when navigating to a new page.
             self._widget.release_keyboard()
