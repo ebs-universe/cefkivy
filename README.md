@@ -70,6 +70,7 @@ published by the end of April 2022.
     - Mouse scrolling functional
     - Right clicks still cause trouble.
     - Remove touch drag functionality and replace with touch scrolling (panning).
+    - Drag vs Scroll causes significant unresolved breakage on websites such as OSM.
 
 ### v66.0.3, March 2022
 
