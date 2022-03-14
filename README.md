@@ -64,6 +64,10 @@ published by the end of April 2022.
   - Rationalize event and event handler chains. 
   - Cleanup additional blocks of dead code.
   - Restructuring for maintainability.
+  - Restructure and near full rewrite of touch processing.
+    - Mouse scrolling functional
+    - Right clicks still cause trouble.
+    - Remove touch drag functionality and replace with touch scrolling (panning).
 
 ### v66.0.3, March 2022
 
