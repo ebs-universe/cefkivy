@@ -7,7 +7,8 @@ from kivy.uix.vkeyboard import VKeyboard
 
 
 class FixedKeyboard(VKeyboard):
-    def __init__(self, **kwargs):
+    def __init__(self, container, **kwargs):
+        self._container = container
         super(FixedKeyboard, self).__init__(**kwargs)
 
     def setup_mode_free(self):
@@ -15,14 +16,20 @@ class FixedKeyboard(VKeyboard):
         self.do_rotation = False
         self.do_scale = False
         self.scale = 1.2
-        target = self.target
-        if not target:
+        if not self._container:
             return
-        self.center_x = Window.width/2
-        self.y = 230
+        self.width = self._container.width * 0.8
+        self.center_x = self._container.center_x
+        self.y = self._container.y
 
 
-Window.set_vkeyboard_class(FixedKeyboard)
+class KeyboardFactory(object):
+    def __init__(self, container):
+        self._container = container
+        self._prototype = FixedKeyboard
+
+    def __call__(self, **kwargs):
+        return self._prototype(self._container, **kwargs)
 
 
 class KeyboardManager(object):
@@ -35,6 +42,7 @@ class KeyboardManager(object):
     def __init__(self, widget, browser, keyboard_mode='local'):
         self._widget = widget
         self._browser = browser
+        self._keyboard_factory = KeyboardFactory(container=self._widget)
         self._install()
         self.keyboard_mode = keyboard_mode
 
@@ -43,6 +51,7 @@ class KeyboardManager(object):
         with open(os.path.join(os.path.dirname(__file__), 'keyboard_trigger.js'), 'r') as f:
             js_code = f.read()
             self._widget.preinstall_js_code(js_code)
+        Window.set_vkeyboard_class(self._keyboard_factory)
 
     @property
     def keyboard_mode(self):
@@ -64,6 +73,8 @@ class KeyboardManager(object):
             self.__keyboard = EventLoop.window.request_keyboard(self.release_keyboard, self._widget)
             self.__keyboard.bind(on_key_down=self._widget.on_key_down)
             self.__keyboard.bind(on_key_up=self._widget.on_key_up)
+            self.__keyboard.bind(on_textinput=self._widget.on_textinput)
+            print("Got Keyboard ", self.__keyboard)
         self._widget.keystroke_processor.reset_all_modifiers()
         # Not sure if it is still required to send the focus
         # (some earlier bug), but it shouldn't hurt to call it.
@@ -81,6 +92,7 @@ class KeyboardManager(object):
         # self.browser.GetFocusedFrame().ExecuteJavascript("__kivy__on_escape()")
         self.__keyboard.unbind(on_key_down=self._widget.on_key_down)
         self.__keyboard.unbind(on_key_up=self._widget.on_key_up)
+        self.__keyboard.unbind(on_textinput=self._widget.on_textinput)
         print("Releasing Keyboard")
         self.__keyboard.release()
         self.__keyboard = None

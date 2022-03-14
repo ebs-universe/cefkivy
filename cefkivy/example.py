@@ -2,7 +2,7 @@
 
 from kivy.config import Config
 Config.set('kivy', 'log_level', 'debug')
-Config.set('kivy', 'keyboard_mode', 'multi')
+Config.set('kivy', 'keyboard_mode', 'systemandmulti')
 
 from cefkivy.browser import CefBrowser, cefpython
 from kivy.app import App

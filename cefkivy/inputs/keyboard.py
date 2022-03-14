@@ -1,4 +1,4 @@
-
+import cefpython3.cefpython_py37
 
 from . import keycodes
 
@@ -7,6 +7,7 @@ class KeystrokeEventProcessor(object):
     def __init__(self, cefpython, browser_widget, *args, **kwargs):
         self.cefpython = cefpython
         self.browser_widget = browser_widget
+        self._use_textinput = kwargs.pop('use_textinput', True)
         # Kivy does not provide modifiers in on_key_up, but these
         # must be sent to CEF as well.
         self.is_lshift = False
@@ -72,8 +73,8 @@ class KeystrokeEventProcessor(object):
 
         # When the key is the return key, send it as a KEYEVENT_CHAR as it will not work in textinputs
         # TODO This thing doesnt work
-        if keycodes.get_character_native(native_key_code) == "enter":
-            event_type = self.cefpython.KEYEVENT_CHAR
+        # if keycodes.get_character_native(native_key_code) == "enter":
+        #     event_type = self.cefpython.KEYEVENT_CHAR
 
         key_event = {
             "type": event_type,
@@ -89,8 +90,11 @@ class KeystrokeEventProcessor(object):
                 "unmodified_character": ord(unmodified_character),
             })
 
-        # print("keydown keyEvent: %s" % key_event)
-        browser.SendKeyEvent(key_event)
+        if self._use_textinput and key_event['type'] == self.cefpython.KEYEVENT_CHAR:
+            pass
+        else:
+            # print("keydown keyEvent: %s" % key_event)
+            browser.SendKeyEvent(key_event)
 
         if keycodes.get_character_native(native_key_code) == 'lshift':
             self.is_lshift = True
@@ -108,7 +112,9 @@ class KeystrokeEventProcessor(object):
             self.is_altgr = True
 
     def on_key_up(self, browser, keyboard, keycode):
-        # print("\non_key_up(): keycode = %s" % (keycode,))
+        # if self._use_textinput:
+        #     return
+        # print("keyup keyEvent %s" % (keycode,))
         cef_modifiers = self.cefpython.EVENTFLAG_NONE
         if self.is_lshift or self.is_rshift:
             cef_modifiers |= self.cefpython.EVENTFLAG_SHIFT_DOWN
@@ -148,3 +154,14 @@ class KeystrokeEventProcessor(object):
             self.is_ralt = False
         if keycodes.get_character_native(native_key_code) == 'alt-gr':
             self.is_altgr = False
+
+    def on_textinput(self, browser, keyboard, character):
+        key_event = {
+            "type": cefpython3.cefpython_py37.KEYEVENT_CHAR,
+            "character": ord(character),
+            # "native_key_code": native_key_code,
+            # "modifiers": cef_modifiers,
+            # "is_system_key": False,
+            # "windows_key_code": windows_key_code,
+        }
+        browser.SendKeyEvent(key_event)

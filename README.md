@@ -60,8 +60,19 @@ Current Status
 Gradual development is continuing in the background as of March 2022.
 The next release, with further fixes for basic functionality, should be 
 published by the end of April 2022.
+
+Pending functionality : 
+  - Popups still don't work and are universally blocked. 
+
+### v66.0.5, March 2022
+
   - JS injection reintroduced for Keyboard management.
   - Default Keyboard mode changed back to local.
+  - Keyboard events changed to use on_text_input instead of on_key_*. This 
+    removes the complexity of keycode processing. 'Special' characters are 
+    still handled the old way.
+  - Virtual Keyboard more or less works. Enter key doesn't seem to be 
+    intuitive, might need work.
 
 ### v66.0.4, March 2022
 

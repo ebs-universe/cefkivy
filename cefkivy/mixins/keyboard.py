@@ -36,3 +36,7 @@ class KeyboardMixin(object):
     def on_key_up(self, *args):
         # print("Kivy Up Event : ", args)
         self.keystroke_processor.on_key_up(self.browser, *args)
+
+    def on_textinput(self, *args):
+        # print("Kivy TextInput Event : ", args)
+        self.keystroke_processor.on_textinput(self.browser, *args)
