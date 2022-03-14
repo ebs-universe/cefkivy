@@ -49,7 +49,8 @@ class JSBindingsMixin(object):
                 self._current_js_bindings.SetFunction(name, target)
         self.browser.SetJavascriptBindings(self._current_js_bindings)
 
-    def inject_js_code(self, browser, frame):
+    def inject_js_code(self, browser, is_loading, can_go_back, can_go_forward):
+        frame = browser.browser.GetMainFrame()
         for code in self._js_codes:
             print("Trying to inject into", frame)
             frame.ExecuteJavascript(code)

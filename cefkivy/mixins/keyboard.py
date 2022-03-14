@@ -9,7 +9,7 @@ from ..components.keyboard import KeyboardManager
 
 
 class KeyboardMixin(object):
-    keyboard_mode = OptionProperty("global", options=("global", "local"))
+    keyboard_mode = OptionProperty("local", options=("global", "local"))
 
     def __init__(self, **kwargs):
         Logger.debug("cefkivy: Starting the Keystroke Processor")
@@ -22,6 +22,12 @@ class KeyboardMixin(object):
         def _propagate_mode(_, mode):
             self.keyboard_manager.keyboard_mode = mode
         self.bind(keyboard_mode=_propagate_mode)
+
+    def release_keyboard(self):
+        self.keyboard_manager.release_keyboard()
+
+    def request_keyboard(self):
+        self.keyboard_manager.request_keyboard()
 
     def on_key_down(self, *args):
         # print("Kivy Down Event : ", args)

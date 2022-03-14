@@ -82,7 +82,7 @@ class CefBrowser(PopupMixin,
         self.browser = None
         start_url = kwargs.pop('start_url', 'about:blank')
         dialog_target = kwargs.pop('dialog_target', None)
-        keyboard_mode = kwargs.pop('keyboard_mode', 'global')
+        keyboard_mode = kwargs.pop('keyboard_mode', 'local')
         resources_dir = kwargs.pop("resources_dir", "")
         ssl_verification_disabled = kwargs.pop("ssl_verification_disabled", False)
         Widget.__init__(self, **kwargs)
@@ -152,7 +152,7 @@ class CefBrowser(PopupMixin,
         self.set_js_bindings()
 
         Logger.debug("cefkivy: Injecting JS Code")
-        self.bind(on_load_start=self.inject_js_code)
+        self.bind(on_loading_state_change=self.inject_js_code)
 
     def check_versions(self):
         md = cefpython.GetModuleDirectory()

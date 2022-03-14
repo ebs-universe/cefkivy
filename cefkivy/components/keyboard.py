@@ -11,14 +11,14 @@ class KeyboardManager(object):
     #    control is focused (input type=text|password or textarea).
     __keyboard = None
 
-    def __init__(self, widget, browser, keyboard_mode='global'):
+    def __init__(self, widget, browser, keyboard_mode='local'):
         self._widget = widget
         self._browser = browser
         self._install()
         self.keyboard_mode = keyboard_mode
 
     def _install(self):
-        self._widget.preinstall_js_binding('___keyboard_update', self.keyboard_update)
+        self._widget.preinstall_js_binding('__kivy__keyboard_update', self.keyboard_update)
         with open(os.path.join(os.path.dirname(__file__), 'keyboard_trigger.js'), 'r') as f:
             js_code = f.read()
             self._widget.preinstall_js_code(js_code)
@@ -47,7 +47,7 @@ class KeyboardManager(object):
         # (some earlier bug), but it shouldn't hurt to call it.
         self._browser.SendFocusEvent(True)
 
-    def release_keyboard(self, *kwargs):
+    def release_keyboard(self):
         # When using local keyboard mode, do all the request
         # and releases of the keyboard through js bindings,
         # otherwise some focus problems arise.
@@ -62,13 +62,19 @@ class KeyboardManager(object):
         self.__keyboard.release()
         self.__keyboard = None
 
-    def keyboard_update(self, shown, rect, attributes):
+    def keyboard_update(self, show, rect, attributes):
         """
-        :param shown: Show keyboard if true, hide if false (blur)
+        :param show: Show keyboard if true, hide if false (blur)
         :param rect: [x,y,width,height] of the input element
         :param attributes: Attributes of HTML element
         """
-        print(shown, rect, attributes)
+        print("KEYBOARD UPDATE ", show, rect, attributes)
+        if self.keyboard_mode == 'global':
+            return
+        if show:
+            self.request_keyboard()
+        else:
+            self.release_keyboard()
         # if shown:
         #     # Check if keyboard should get displayed above
         #     above = False

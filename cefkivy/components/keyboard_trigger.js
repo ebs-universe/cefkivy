@@ -1,7 +1,9 @@
 
 
-window.print=function(){console.log("Print dialog blocked")}
+if (__keyboard_trigger_injected === undefined){
+    var __keyboard_trigger_injected = true;
 
+window.print=function(){console.log("Print dialog blocked")}
 
 function isKeyboardElement(elem) {
     var tag = elem.tagName.toUpperCase();
@@ -17,7 +19,6 @@ function isKeyboardElement(elem) {
     return false;
 }
 
-
 function getAttributes(elem){
     var attributes = {}
     for (var att, i = 0, atts = elem.attributes, n = atts.length; i < n; i++){
@@ -27,23 +28,28 @@ function getAttributes(elem){
     return attributes
 }
 
-
 window.addEventListener("focus", function (e) {
-    
-    attributes = getAttributes(e.target)
-    if (isKeyboardElement(e.target)) __kivy__keyboard_update(true, lrect, attributes);
+    attributes = getAttributes(e.target);
+    rect = e.target.getBoundingClientRect();
+    if (isKeyboardElement(e.target)) {
+        __kivy__keyboard_update(true, rect, attributes);
+    }
+    else {
+        __kivy__keyboard_update(false, rect, attributes);
+    }
 }, true);
-
 
 window.addEventListener("blur", function (e) {
-    
     attributes = getAttributes(e.target)
-    __kivy__keyboard_update(false, lrect, attributes);
+    rect = e.target.getBoundingClientRect();
+    __kivy__keyboard_update(false, rect, attributes);
 }, true);
 
 
-function __kivy__on_escape() {
-    if (document.activeElement) {
-        document.activeElement.blur();
-    }
+//function __kivy__on_escape() {
+//    if (document.activeElement) {
+//        document.activeElement.blur();
+//    }
+//}
+
 }
