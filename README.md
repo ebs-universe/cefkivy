@@ -57,13 +57,15 @@ Current Status
 
 ### Next
 
-Gradual development is continuing in the background as of February 2022.
+Gradual development is continuing in the background as of March 2022.
 The next release, with further fixes for basic functionality, should be 
-published by the end of April 2022. 
+published by the end of April 2022.
+
+### v66.0.4, March 2022
 
   - Rationalize event and event handler chains. 
   - Cleanup additional blocks of dead code.
-  - Restructuring for maintainability.
+  - Restructure for maintainability.
   - Restructure and near full rewrite of touch processing.
     - Mouse scrolling functional
     - Right clicks still cause trouble.
