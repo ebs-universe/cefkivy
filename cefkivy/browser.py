@@ -18,6 +18,7 @@ else:
     from cefpython3 import cefpython
 
 from kivy.app import App
+
 from kivy.graphics import Color, Rectangle
 from kivy.graphics.texture import Texture
 from kivy.uix.widget import Widget
@@ -31,6 +32,7 @@ from .mixins.cookies import CookieManagerMixin
 from .mixins.security import SecurityMixin
 from .mixins.dialogs import DialogMixin
 from .mixins.popup import PopupMixin
+from .mixins.jsbindings import JSBindingsMixin
 
 from .handlers.display import DisplayHandler
 from .handlers.download import DownloadHandler
@@ -46,6 +48,7 @@ class CefBrowser(PopupMixin,
                  DialogMixin,
                  TouchMixin,
                  KeyboardMixin,
+                 JSBindingsMixin,
                  CookieManagerMixin,
                  SecurityMixin,
                  NavigationMixin,
@@ -72,11 +75,8 @@ class CefBrowser(PopupMixin,
         RequestHandler,
     ]
 
-    # _reset_js_bindings = False  # See set_js_bindings()
-    # _js_bindings = None  # See set_js_bindings()
-
     def __init__(self, **kwargs):
-        switches = kwargs.pop("switches", {})
+        switches = kwargs.pop("switches", {'remote-debugging-port': '9222'})
 
         self.__rect = None
         self.browser = None
@@ -142,12 +142,17 @@ class CefBrowser(PopupMixin,
         self.bind(size=self.realign)
         self.bind(pos=self.realign)
 
-        KeyboardMixin.__init__(self, keyboard_mode)
+        JSBindingsMixin.__init__(self)
+        KeyboardMixin.__init__(self, keyboard_mode=keyboard_mode)
         TouchMixin.__init__(self)
         DialogMixin.__init__(self, dialog_target)
         PopupMixin.__init__(self)
-        # Logger.debug("cefkivy: Setting JS Bindings")
-        # self.set_js_bindings()
+
+        Logger.debug("cefkivy: Setting JS Bindings")
+        self.set_js_bindings()
+
+        Logger.debug("cefkivy: Injecting JS Code")
+        self.bind(on_load_start=self.inject_js_code)
 
     def check_versions(self):
         md = cefpython.GetModuleDirectory()
@@ -163,31 +168,6 @@ class CefBrowser(PopupMixin,
     def install_handler(self, handler):
         Logger.debug("cefkivy: Installing ClientHandler <Class {}>".format(handler.__name__))
         self.browser.SetClientHandler(handler(self))
-
-    # @property
-    # def reset_js_bindings(self):
-    #     return self._reset_js_bindings
-    #
-    # def set_js_bindings(self):
-    #     # Needed to introduce set_js_bindings again because the freeze of sites at load took over.
-    #     # As an example 'http://www.htmlbasix.com/popup.shtml' freezed every time. By setting the js
-    #     # bindings again, the freeze rate is at about 35%. Check git to see how it was done, before using
-    #     # this function ...
-    #     # I (jegger) have to be honest, that I don't have a clue why this is acting like it does!
-    #     # I hope simon (REN-840) can resolve this once in for all...
-    #     #
-    #     # ORIGINAL COMMENT:
-    #     # When browser.Navigate() is called, some bug appears in CEF
-    #     # that makes CefRenderProcessHandler::OnBrowserDestroyed()
-    #     # is being called. This destroys the javascript bindings in
-    #     # the Render process. We have to make the js bindings again,
-    #     # after the call to Navigate() when OnLoadingStateChange()
-    #     # is called with isLoading=False. Problem reported here:
-    #     # http://www.magpcss.org/ceforum/viewtopic.php?f=6&t=11009
-    #     if not self._js_bindings:
-    #         self._js_bindings = cefpython.JavascriptBindings(bindToFrames=True, bindToPopups=True)
-    #         self._js_bindings.SetFunction("__kivy__keyboard_update", self.keyboard_update)
-    #     self.browser.SetJavascriptBindings(self._js_bindings)
 
     def realign(self, *_):
         ts = self.texture.size
