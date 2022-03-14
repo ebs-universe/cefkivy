@@ -137,9 +137,9 @@ class KivyTouchProcessor(object):
                 self._dispatch_drag_end_event(x, y)
             elif touch.is_mouse_scrolling:
                 if touch.button == 'scrolldown':
-                    dy = -1
-                elif touch.button == 'scrollup':
                     dy = +1
+                elif touch.button == 'scrollup':
+                    dy = -1
                 else:
                     raise ValueError("Got mouse_scrolling with button {}".format(touch.button))
                 self._dispatch_scroll_event(x, y, 0, dy * self._mouse_scroll_step)
