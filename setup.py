@@ -25,7 +25,7 @@ setup(name='cefkivy-ebs',
       url='https://github.com/ebs-universe/cefkivy',
 
       packages=setuptools.find_packages(),
-      package_data={'cefkivy': ['*.kv']},
+      package_data={'cefkivy': ['*.kv', '*.js']},
 
       python_requires='>=3.4, <3.8',
       install_requires=install_reqs,
