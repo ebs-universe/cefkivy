@@ -36,6 +36,10 @@ If you are considering using this:
   - If upstream resumes development, or an alternate means to provide a 
   browser widget to Kivy is developed, this fork and the associated pypi 
   package will likely become unmaintained.
+  - No work has been done to make sure this works on Mac, Windows, or Android. 
+  There is unlikely to be ever any such work. That said, there is nothing that 
+  I can think of which would break it on Mac/Windows, and trying to install 
+  cefpython on Android is likely to be a fool's errand.
   - Issues are welcome. Those dealing with install and basic functionality 
   will be prioritized. Feature / upgrade requests, if meaningful, will be 
   left open.
@@ -44,7 +48,8 @@ If you are considering using this:
   - If you are able and willing to take over or contribute to the development 
   of this package, please get in touch with me. Primarily, I anticipate 
   skilled time will need to be invested to help bring this (and `cefpython3`) 
-  up to date and keep it there.
+  up to date and keep it there. Additionally, having someone to keep the 
+  library functional on Mac/Windows would be helpful.
 
 If you do end up using this package - especially if you do so in a 
 production setting - please reach out to me and let me know by email at 
@@ -57,18 +62,50 @@ Current Status
 
 ### Next
 
-Gradual development is continuing in the background as of March 2022.
-The next release, with further fixes for basic functionality, should be 
-published by the end of April 2022.
+The package as it stands works, more or less. Development is suspended for the most part. 
+I don't actually test this with very new version of things or new combinations of 
+environment and dependencies, so if you find any issues please feel free to report them.
+If you can provide a fix which does not break anything presently working, or if I can 
+reproduce the issue, I will do what I can to fix it. 
 
-Pending functionality : 
+Known Issues : 
+
   - Popups still don't work and are universally blocked. 
+  - The enter key still doesn't work as expected on both the physical and virtual keyboards. 
+  Not entirely certain if it is supposed to.
+  - Touch gestures are broken. 
+     - Left click works fine. Right click doesn't. 
+     - Two finger scroll isn't really working, but might not be very 
+     difficult to fix.
+     - Drag remains disabled, and drag events are translated to scroll events.
+     - Repurposing the drag events breaks interaction where drag is actually 
+     needed. Things like OSM and Google Maps zoom (scroll) when the intent is 
+     pan (drag).
+     - Pinch to zoom is not implemented. 
+  - Some restructuring of the Mixins is needed to better capture the dependencies and 
+  create a reliable MRO. 
+  - Documentation and examples need to be written up.
+
+Future Steps are dependent on available time and bandwidth, and in some ways more so
+on the cefpython version. Specifically, the following external updates might be important: 
+
+  - cefpython 66.1 should provide support for python version(s) later than 3.7.x. See 
+  https://github.com/cztomczak/cefpython/issues/609
+  - Chromium 74 or so should provide `OnVirtualKeyboardRequested`, which could make
+  triggering the virtual keyboard more reliable and remove the horrible JS injection.
+  See https://bitbucket.org/chromiumembedded/cef/pull-requests/202/added-cefrenderhandler
+  - The roadmap for Multitouch and gestures is not quite clear to me. 
+  See https://github.com/cztomczak/cefpython/issues/57
+
+### v66.0.6, v66.0.7, v66.0.8 March 2022
+
+  - Minor bugfix / maintenance updates, closing out open development threads.
 
 ### v66.0.5, March 2022
 
   - JS injection reintroduced for Keyboard management.
   - Default Keyboard mode changed back to local.
-  - Keyboard events changed to use on_text_input instead of on_key_*. This 
+  - Keyboard events changed to use `on_text_input` instead of `on_key_*`. This 
     removes the complexity of keycode processing. 'Special' characters are 
     still handled the old way.
   - Virtual Keyboard more or less works. Enter key doesn't seem to be 
