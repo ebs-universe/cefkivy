@@ -199,20 +199,3 @@ class CefBrowser(PopupMixin,
     def update_rect(self):
         if self.__rect:
             self.__rect.texture = self.texture
-
-
-if __name__ == '__main__':
-    class CefApp(App):
-        def build(self):
-            cb = CefBrowser(url="http://jegger.ch/datapool/app/test1.html",
-                            keyboard_above_classes=["select2-input", ])
-            w = Widget()
-            w.add_widget(cb)
-            #cb.pos = (100, 10)
-            #cb.size = (1720, 480)
-            return cb
-
-    CefApp().run()
-
-    cefpython.Shutdown()
-
