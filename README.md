@@ -96,11 +96,11 @@ on the cefpython version. Specifically, the following external updates might be 
   - The roadmap for Multitouch and gestures is not quite clear to me. 
   See https://github.com/cztomczak/cefpython/issues/57
 
-### v66.0.9, April 2022
+### v66.0.11, April 2022
 
   - Migrate to the new kivy_garden flower format. 
 
-### v66.0.6, v66.0.7, v66.0.8 March 2022
+### v66.0.6 - v66.0.10 March 2022
 
   - Minor bugfix / maintenance updates, closing out open development threads.
 
