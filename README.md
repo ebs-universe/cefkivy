@@ -18,15 +18,14 @@ installable and minimal maintenance to ensure functionality.
   package name with no apparent commits and/or no real version history.
 
 The original rentouch cefkivy repository is being forked here 
-and will be made available as the `cefkivy-ebs` package on PyPI. 
+and will be made available as the `kivy_garden.ebs.cefkivy` package 
+on PyPI. 
 
-Though the package will be installed as `cefkivy-ebs`, the actual 
-importable package will still be `cefkivy`. Due to this, this fork 
-and upstream cannot coexist in the same python environment. 
-
-This package contains no EBS-specific code and has no dependencies 
-outside of `cefpython3`, `kivy`, and the Python Standard Library. 
-For detailed install notes, see [INSTALL.md](INSTALL.md).
+This package contains some minimal EBS-specific code and depends on 
+[kivy_garden.ebs.core](https://github.com/ebs-universe/kivy_garden.ebs.core). 
+This dependency is easily removed, but has been left in for the moment. 
+In addition, the package depends on `cefpython3`, `kivy`, and the Python 
+Standard Library. For detailed install notes, see [INSTALL.md](INSTALL.md).
 
 If you are considering using this: 
 
@@ -96,6 +95,10 @@ on the cefpython version. Specifically, the following external updates might be 
   See https://bitbucket.org/chromiumembedded/cef/pull-requests/202/added-cefrenderhandler
   - The roadmap for Multitouch and gestures is not quite clear to me. 
   See https://github.com/cztomczak/cefpython/issues/57
+
+### v66.0.9, April 2022
+
+  - Migrate to the new kivy_garden flower format. 
 
 ### v66.0.6, v66.0.7, v66.0.8 March 2022
 

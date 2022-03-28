@@ -1,5 +1,5 @@
 
-from cefkivy.handlers.base import ClientHandlerBase
+from kivy_garden.ebs.cefkivy.handlers.base import ClientHandlerBase
 
 
 class LoadHandler(ClientHandlerBase):

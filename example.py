@@ -4,13 +4,13 @@ from kivy.config import Config
 Config.set('kivy', 'log_level', 'debug')
 Config.set('kivy', 'keyboard_mode', 'systemandmulti')
 
-from cefkivy.browser import CefBrowser, cefpython
+from kivy_garden.ebs.cefkivy.browser import CefBrowser, cefpython
 from kivy.app import App
 
 
 class CefBrowserApp(App):
     def build(self):
-        return CefBrowser(start_url='http://google.com')
+        return CefBrowser(start_url='https://www.google.com/')
 
 
 def run():

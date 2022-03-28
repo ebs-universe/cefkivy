@@ -1,9 +1,9 @@
 
 
-from cefkivy.handlers.base import ClientHandlerBase
+from kivy_garden.ebs.cefkivy.handlers.base import ClientHandlerBase
 from ..components import jsdialog
 
-from cefkivy.browser import cefpython
+from kivy_garden.ebs.cefkivy.browser import cefpython
 
 
 class JavascriptDialogHandler(ClientHandlerBase):

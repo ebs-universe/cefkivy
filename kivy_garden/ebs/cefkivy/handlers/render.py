@@ -1,6 +1,6 @@
 from cefpython3 import cefpython
 
-from cefkivy.handlers.base import ClientHandlerBase
+from kivy_garden.ebs.cefkivy.handlers.base import ClientHandlerBase
 
 
 class RenderHandler(ClientHandlerBase):

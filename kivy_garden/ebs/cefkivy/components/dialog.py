@@ -4,9 +4,9 @@ from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-# TODO Make the ebs dependency installable or just include the code directly
-from ebs.iot.linuxnode.widgets.colors import ColorBoxLayout
-from ebs.iot.linuxnode.widgets.labels import WrappingLabel
+
+from kivy_garden.ebs.core.colors import ColorBoxLayout
+from kivy_garden.ebs.core.labels import WrappingLabel
 
 
 class MessageDialogBase(object):

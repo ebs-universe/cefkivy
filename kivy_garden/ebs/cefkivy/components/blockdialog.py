@@ -1,6 +1,6 @@
 
 
-from cefkivy.components.dialog import MessageDialogBase
+from kivy_garden.ebs.cefkivy.components.dialog import MessageDialogBase
 
 
 class BlockDialog(MessageDialogBase):
