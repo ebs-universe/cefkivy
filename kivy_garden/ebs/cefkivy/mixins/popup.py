@@ -5,6 +5,7 @@ from ..components.blockdialog import PopupBlockDialog
 
 class PopupMixin(object):
     popup = None
+    _popup_block_dialog_class = PopupBlockDialog
 
     def __init__(self):
         self.register_event_type("on_before_popup")
@@ -16,8 +17,8 @@ class PopupMixin(object):
                         no_javascript_access_out):
         # TODO Implement popups here. Suppressed for now.
         print("Opening Popup : ", target_url, user_gesture, target_disposition)
-        block_dialog = PopupBlockDialog(browser=self.browser, callback=None,
-                                        message_text=target_url)
+        block_dialog = self._popup_block_dialog_class(browser=self.browser, callback=None,
+                                                      message_text=target_url)
         self.dialog_show(block_dialog)
         return True
 
