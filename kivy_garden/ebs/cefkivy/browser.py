@@ -83,6 +83,7 @@ class CefBrowser(PopupMixin,
         start_url = kwargs.pop('start_url', 'about:blank')
         dialog_target = kwargs.pop('dialog_target', None)
         keyboard_mode = kwargs.pop('keyboard_mode', 'local')
+        keyboard_container = kwargs.pop('keyboard_container', None)
         resources_dir = kwargs.pop("resources_dir", "")
         ssl_verification_disabled = kwargs.pop("ssl_verification_disabled", False)
         Widget.__init__(self, **kwargs)
@@ -143,7 +144,7 @@ class CefBrowser(PopupMixin,
         self.bind(pos=self.realign)
 
         JSBindingsMixin.__init__(self)
-        KeyboardMixin.__init__(self, keyboard_mode=keyboard_mode)
+        KeyboardMixin.__init__(self, keyboard_mode=keyboard_mode, keyboard_container=keyboard_container)
         TouchMixin.__init__(self)
         DialogMixin.__init__(self, dialog_target)
         PopupMixin.__init__(self)

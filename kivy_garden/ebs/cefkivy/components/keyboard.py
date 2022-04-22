@@ -39,10 +39,10 @@ class KeyboardManager(object):
     #    control is focused (input type=text|password or textarea).
     __keyboard = None
 
-    def __init__(self, widget, browser, keyboard_mode='local'):
+    def __init__(self, widget, browser, keyboard_mode='local', keyboard_container=None):
         self._widget = widget
         self._browser = browser
-        self._keyboard_factory = KeyboardFactory(container=self._widget)
+        self._keyboard_factory = KeyboardFactory(container=keyboard_container or self._widget)
         self._install()
         self.keyboard_mode = keyboard_mode
 
