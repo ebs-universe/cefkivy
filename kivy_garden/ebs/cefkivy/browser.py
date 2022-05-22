@@ -85,6 +85,7 @@ class CefBrowser(PopupMixin,
         keyboard_mode = kwargs.pop('keyboard_mode', 'local')
         keyboard_container = kwargs.pop('keyboard_container', None)
         resources_dir = kwargs.pop("resources_dir", "")
+        cache_dir = kwargs.pop("cache_dir", "")
         ssl_verification_disabled = kwargs.pop("ssl_verification_disabled", False)
         Widget.__init__(self, **kwargs)
 
@@ -111,6 +112,9 @@ class CefBrowser(PopupMixin,
             "browser_subprocess_path": "%s/%s" % (cefpython.GetModuleDirectory(), "subprocess"),
             'background_color': 0xFFFFFFFF,
         }
+
+        if cache_dir:
+            settings['cache_path'] = cache_dir
 
         Logger.debug("cefkivy: Intializing cefpython with \n"
                      "   settings : %s \n"

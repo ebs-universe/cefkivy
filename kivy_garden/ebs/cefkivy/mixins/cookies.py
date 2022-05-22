@@ -24,6 +24,7 @@ class CookieManagerMixin(object):
         cookie_manager = cefpython.CookieManager.GetGlobalManager()
         cookie_path = os.path.join(resources, "cookies")
         cookie_manager.SetStoragePath(cookie_path, True)
+        self.delete_cookie()
 
     def delete_cookie(self, url=""):
         """ Deletes the cookie with the given url. If url is empty all cookies get deleted.
