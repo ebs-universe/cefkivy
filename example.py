@@ -10,7 +10,7 @@ from kivy.app import App
 
 class CefBrowserApp(App):
     def build(self):
-        return CefBrowser(start_url='https://www.google.com/')
+        return CefBrowser(start_url='https://india.gov.in/')
 
 
 def run():

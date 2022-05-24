@@ -1,9 +1,10 @@
 
 
 class DialogMixin(object):
-    def __init__(self, dialog_target=None):
+    def __init__(self, dialog_target=None, text_font_params=None):
         self._dialog_target = dialog_target
         self._current_dialog = None
+        self._dialog_text_font_params = text_font_params or {}
 
     @property
     def dialog_target(self):
@@ -30,7 +31,7 @@ class DialogMixin(object):
             dialog.cancel()
             return
 
-        self._current_dialog = dialog.build()
+        self._current_dialog = dialog.build(self._dialog_text_font_params)
         dialog.when_done = self.dialog_finish
         self.opacity = 0.3
         self.disabled = True

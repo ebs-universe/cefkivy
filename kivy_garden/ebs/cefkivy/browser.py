@@ -87,6 +87,7 @@ class CefBrowser(PopupMixin,
         resources_dir = kwargs.pop("resources_dir", "")
         cache_dir = kwargs.pop("cache_dir", "")
         ssl_verification_disabled = kwargs.pop("ssl_verification_disabled", False)
+        text_font_params = kwargs.pop("text_font_params", {})
         Widget.__init__(self, **kwargs)
 
         self.check_versions()
@@ -150,7 +151,7 @@ class CefBrowser(PopupMixin,
         JSBindingsMixin.__init__(self)
         KeyboardMixin.__init__(self, keyboard_mode=keyboard_mode, keyboard_container=keyboard_container)
         TouchMixin.__init__(self)
-        DialogMixin.__init__(self, dialog_target)
+        DialogMixin.__init__(self, dialog_target, text_font_params)
         PopupMixin.__init__(self)
 
         Logger.debug("cefkivy: Setting JS Bindings")

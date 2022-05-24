@@ -26,7 +26,7 @@ class MessageDialogBase(object):
         self._autoclose = autoclose
         self._finished = False
 
-    def build(self):
+    def build(self, text_font_params):
         if self._autoclose:
             self._message_text = self._message_text + \
                                  "\nThis message will close in {} seconds.".format(self._autoclose)
@@ -51,7 +51,7 @@ class MessageDialogBase(object):
             pass
 
         uix_layout = BoxLayout(orientation='vertical', spacing=10, padding=[10], size_hint_y=None)
-        label = WrappingLabel(text=self._message_text, color=self._fgcolor, size_hint=(1, None))
+        label = WrappingLabel(text=self._message_text, color=self._fgcolor, size_hint=(1, None), **text_font_params)
         uix_layout.add_widget(label)
 
         if self._user_input:
