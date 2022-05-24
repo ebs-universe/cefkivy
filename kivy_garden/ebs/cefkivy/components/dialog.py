@@ -43,7 +43,7 @@ class MessageDialogBase(object):
         )
 
         if self._title:
-            title = Label(text=self._title, color=self._fgcolor)
+            title = Label(text=self._title, color=self._fgcolor, **text_font_params)
             dialog_widget.add_widget(title)
 
         rich_layout = BoxLayout(orientation='horizontal', size_hint_y=None)
@@ -71,7 +71,7 @@ class MessageDialogBase(object):
 
         button_layout = BoxLayout(orientation='horizontal', spacing=10, height=35)
         for text, action in self._button_specs:
-            lbutton = Button(text=text)
+            lbutton = Button(text=text, **text_font_params)
             lbutton.bind(on_press=action)
             button_layout.add_widget(lbutton)
 
