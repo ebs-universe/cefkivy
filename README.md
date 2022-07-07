@@ -96,6 +96,17 @@ on the cefpython version. Specifically, the following external updates might be 
   - The roadmap for Multitouch and gestures is not quite clear to me. 
   See https://github.com/cztomczak/cefpython/issues/57
 
+### v66.0.16, July 2022
+  
+  - Painted popups implementation reintegrated. 
+
+### v66.0.12 - v66.0.15, Apr - May 2022
+  
+  - Fix fonts on UI elements. 
+  - Add basic cache control hooks.
+  - Keyboard display location made targettable.
+  - Block dialog messages made customizable.
+
 ### v66.0.11, April 2022
 
   - Migrate to the new kivy_garden flower format. 

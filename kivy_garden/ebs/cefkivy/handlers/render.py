@@ -1,3 +1,5 @@
+
+
 from cefpython3 import cefpython
 
 from kivy_garden.ebs.cefkivy.handlers.base import ClientHandlerBase
@@ -23,19 +25,19 @@ class RenderHandler(ClientHandlerBase):
         pass
 
     def OnPopupShow(self, browser, show):
-        self._widget.remove_widget(self._widget.popup)
+        self._widget.remove_widget(self._widget.painted_popup)
         if show:
-            self._widget.add_widget(self._widget.popup)
+            self._widget.add_widget(self._widget.painted_popup)
 
     def OnPopupSize(self, browser, rect_out):
-        self._widget.popup.rpos = (rect_out[0], rect_out[1])
-        self._widget.popup.size = (rect_out[2], rect_out[3])
+        self._widget.painted_popup.rpos = (rect_out[0], rect_out[1])
+        self._widget.painted_popup.size = (rect_out[2], rect_out[3])
 
     def OnPaint(self, browser, element_type, dirty_rects, paint_buffer, width, height):
         b = paint_buffer.GetString(mode="bgra", origin="top-left")
 
         if element_type != cefpython.PET_VIEW:
-            popup = self._widget.popup
+            popup = self._widget.painted_popup
             if popup.texture.width * popup.texture.height * 4 != len(b):
                 return  # prevent segfault
             popup.texture.blit_buffer(b, colorfmt='bgra', bufferfmt='ubyte')
@@ -44,6 +46,7 @@ class RenderHandler(ClientHandlerBase):
 
         if self._widget.texture.width * self._widget.texture.height * 4 != len(b):
             return  # prevent segfault
+
         self._widget.texture.blit_buffer(b, colorfmt='bgra', bufferfmt='ubyte')
         self._widget.update_rect()
         return
