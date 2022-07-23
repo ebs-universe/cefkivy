@@ -69,9 +69,8 @@ reproduce the issue, I will do what I can to fix it.
 
 Known Issues : 
 
-  - Popups still don't work and are universally blocked. 
-  - The enter key still doesn't work as expected on both the physical and virtual keyboards. 
-  Not entirely certain if it is supposed to.
+  - Popups still aren't implemented. Links leading to popups and new tabs open in the main 
+  browser window instead and replace the parent page. 
   - Touch gestures are broken. 
      - Left click works fine. Right click doesn't. 
      - Two finger scroll isn't really working, but might not be very 
@@ -81,6 +80,8 @@ Known Issues :
      needed. Things like OSM and Google Maps zoom (scroll) when the intent is 
      pan (drag).
      - Pinch to zoom is not implemented. 
+  - The enter key still doesn't work as expected on both the physical and virtual keyboards. 
+  Not entirely certain if it is supposed to.
   - Some restructuring of the Mixins is needed to better capture the dependencies and 
   create a reliable MRO. 
   - Documentation and examples need to be written up.
@@ -95,6 +96,10 @@ on the cefpython version. Specifically, the following external updates might be 
   See https://bitbucket.org/chromiumembedded/cef/pull-requests/202/added-cefrenderhandler
   - The roadmap for Multitouch and gestures is not quite clear to me. 
   See https://github.com/cztomczak/cefpython/issues/57
+
+### v66.0.17, July 2022
+
+  - Popups and new tabs redirected to the main browser window instead.
 
 ### v66.0.16, July 2022
   
