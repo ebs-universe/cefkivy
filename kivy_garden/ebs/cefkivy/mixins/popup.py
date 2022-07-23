@@ -18,7 +18,8 @@ class PopupMixin(object):
     painted_popup = None
     _popup_block_dialog_class = PopupBlockDialog
 
-    def __init__(self):
+    def __init__(self, popup_action):
+        self._popup_action = popup_action
         self.register_event_type("on_before_popup")
         Logger.debug("cefkivy: Instantiating Browser Painted Popups")
         self.painted_popup = CefBrowserPaintedPopup(self)
@@ -26,8 +27,15 @@ class PopupMixin(object):
     def on_before_popup(self, browser, frame, target_url, target_frame_name, target_disposition,
                         user_gesture, popup_features, window_info_out, client, browser_settings_out,
                         no_javascript_access_out):
-        # TODO Implement popups here. Suppressed for now.
-        print("Opening Popup : ", target_url, user_gesture, target_disposition)
+
+        if self._popup_action == 'replace':
+            # print("Navigating to requested popup instead : ",
+            #       target_url, user_gesture, target_disposition)
+            self.browser.Navigate(target_url)
+            return True
+
+        print("Blocking Popup : ",
+              target_url, user_gesture, target_disposition)
         block_dialog = self._popup_block_dialog_class(browser=self.browser, callback=None,
                                                       message_text=target_url)
         self.dialog_show(block_dialog)
