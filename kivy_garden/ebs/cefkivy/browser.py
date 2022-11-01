@@ -115,6 +115,8 @@ class CefBrowser(PopupMixin,
             'background_color': 0xFFFFFFFF,
         }
 
+        switches['enable-media-stream'] = ''
+
         if cache_dir:
             settings['cache_path'] = cache_dir
 
